@@ -1,6 +1,8 @@
 import socket
 import threading
+import json
 from config import server_host, server_port
+
 
 host = server_host
 port = server_port
@@ -9,6 +11,12 @@ max_connections = 5  # Limite de conexões simultâneas
 # Variável para rastrear as conexões ativas
 active_connections = 0
 connection_lock = threading.Lock()
+
+dados = {
+    "1": {"nome": "Abacaxi", "preco": "10.99"},
+    "2": {"nome": "Melancia", "preco": "8.99"},
+    "3": {"nome": "Abobora", "preco": "4.99"}
+}
 
 
 # Função para lidar com cada conexão (cliente):
@@ -32,10 +40,15 @@ def handle_client(conn):
             data = conn.recv(1024).decode('utf-8')
             if not data:
                 break
-            
-            print("Cliente:", data)
-            message = input("-> ")
-            conn.send(message.encode('utf-8'))
+            else:
+                print("Data: ", data)
+                objeto = dados.get(data)
+                print("objeto: ", objeto)
+
+                if objeto is not None:
+                    conn.send(json.dumps(objeto).encode('utf-8'))
+                else:
+                    conn.send("Chave não encontrada.".encode('utf-8'))
     except Exception as e:
         print("Erro:", e)
     finally:
