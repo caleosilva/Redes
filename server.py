@@ -1,4 +1,4 @@
-import socket
+import socket #1024 é o suficiente?
 import threading
 import json
 from config import server_host, server_port
@@ -13,9 +13,9 @@ active_connections = 0
 connection_lock = threading.Lock()
 
 dados = {
-    "1": {"nome": "Abacaxi", "preco": "10.99"},
-    "2": {"nome": "Melancia", "preco": "8.99"},
-    "3": {"nome": "Abobora", "preco": "4.99"}
+    "1": {"nome": "Abacaxi", "preco": "10.99", "quantidade": 10},
+    "2": {"nome": "Melancia", "preco": "8.99", "quantidade": 5},
+    "3": {"nome": "Abobora", "preco": "4.99", "quantidade": 23}
 }
 
 
@@ -41,9 +41,7 @@ def handle_client(conn):
             if not data:
                 break
             else:
-                print("Data: ", data)
                 objeto = dados.get(data)
-                print("objeto: ", objeto)
 
                 if objeto is not None:
                     conn.send(json.dumps(objeto).encode('utf-8'))
