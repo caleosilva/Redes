@@ -20,7 +20,7 @@ class ResponseData:
 def accept_connections(server_socket, data_queue):
     while True:
         client_socket, client_address = server_socket.accept()
-        print("accept_connections:", client_address, "\n")
+        print("Nova conexão:", client_address, "\n")
         client_thread = threading.Thread(target=handle_client, args=(client_socket, data_queue))
         client_thread.start()
 
@@ -29,7 +29,7 @@ def handle_client(client_socket, data_queue):
         try:
             id = client_socket.recv(1024).decode('utf-8')
             if id:
-                print("ID recebido:", id)
+                # print("ID recebido:", id)
                 data_queue.append((id, client_socket))
         except Exception as e:
             print("Erro ao lidar com o cliente:", e)
