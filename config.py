@@ -1,3 +1,3 @@
-socket_host = '127.0.0.1'
-socket_port = 3004
+socket_host = '127.0.0.1' # Host
+socket_port = 1234
 server_host = 'http://localhost:8000/'
