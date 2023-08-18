@@ -46,8 +46,8 @@ class MyHandler(BaseHTTPRequestHandler):
             self.end_headers()
             self.wfile.write(b'URL invalida')
 
-    # Método para lidar com solicitações POST
 
+    # Método para lidar com solicitações POST
     def do_POST(self):
         # Envia uma resposta com código 200 (OK)
         self.send_response(200)
