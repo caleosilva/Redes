@@ -30,7 +30,6 @@ def handle_client(client_socket, data_queue):
         try:
             id = client_socket.recv(1024).decode('utf-8')
             if id:
-                print("ID recebido:", id)
                 data_queue.append((id, client_socket))
         except Exception as e:
             print("Erro ao lidar com o cliente:", e)
