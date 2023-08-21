@@ -9,6 +9,7 @@ import threading
 from collections import deque
 import requests
 from config import server_host, socket_host, socket_port
+import json
 
 
 class ResponseData:
@@ -29,12 +30,11 @@ def handle_client(client_socket, data_queue):
         try:
             id = client_socket.recv(1024).decode('utf-8')
             if id:
-                # print("ID recebido:", id)
+                print("ID recebido:", id)
                 data_queue.append((id, client_socket))
         except Exception as e:
             print("Erro ao lidar com o cliente:", e)
             break  # Encerra o loop se ocorrer um erroI
-
 
 def make_http_requests(data_queue, response_queue):
     while True:
@@ -44,7 +44,7 @@ def make_http_requests(data_queue, response_queue):
             try:
                 # print("make_http_requests: ", client_socket, "\n")
                 response = requests.get(server_host + id)
-                response_queue.append(ResponseData(id, response.text, client_socket))
+                response_queue.append(ResponseData(id, response, client_socket))
             except Exception as e:
                 print("Erro ao fazer a solicitação HTTP:", e)
 
@@ -53,10 +53,23 @@ def process_http_responses(response_queue):
         if response_queue:
             response_data = response_queue.popleft()
             try:
-                # print("process_http_responses: ", response_data.client_socket)
-                response_data.client_socket.send(response_data.response.encode('utf-8'))
+
+                if (response_data.response.status_code == 204):
+                    mensagem = "Produto não encontrado"
+                    response_data.client_socket.send(mensagem.encode('utf-8'))
+
+                elif (response_data.response.status_code == 200):                
+                    data_dict = response_data.response.json()
+                    data = json.dumps(data_dict)
+                    response_data.client_socket.send(data.encode('utf-8'))
+
+                else:
+                    response_data.client_socket.send("Erro".encode('utf-8'))
+
+
             except Exception as e:
                 print("Erro ao enviar resposta para o cliente:", e)
+
 def main():
     host = socket_host
     port = socket_port

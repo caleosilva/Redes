@@ -10,13 +10,9 @@ dados = {
 
 # Define uma classe de manipulador personalizada que herda de BaseHTTPRequestHandler
 class MyHandler(BaseHTTPRequestHandler):
+
     # Método para lidar com solicitações GET
     def do_GET(self):
-        # Envia uma resposta com código 200 (OK)
-        self.send_response(200)
-        self.send_header('Content-type', 'text/html')  # "text/html"
-        self.end_headers()
-
         partes_url = self.path.split('/')
 
         if partes_url[1] == '':
