@@ -15,12 +15,6 @@ import json
 # {client_socket: True, client_socket: True, client_socket: False}
 conexoes = {}
 
-class ResponseData:
-    def __init__(self, id, response, client_socket):
-        self.id = id
-        self.response = response
-        self.client_socket = client_socket
-
 def aceitar_conexoes(server_socket, data_queue):
     while True:
         client_socket, client_address = server_socket.accept()
