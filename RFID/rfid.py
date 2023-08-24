@@ -26,7 +26,7 @@ try:
 
             # Verifica se a tag já foi lida recentemente
             tempo_atual = time.time()
-            if tag_id not in ultimo_tempo_leitura or (tempo_atual - ultimo_tempo_leitura[tag_id]) > 2.0:  # Aguarda 2 segundos
+            if tag_id not in ultimo_tempo_leitura or (tempo_atual - ultimo_tempo_leitura[tag_id]) > 7.0:  # Aguarda 7 segundos
                 ultimo_tempo_leitura[tag_id] = tempo_atual
                 sock.send(tag_id.encode())
                 response = sock.recv(1024)  # Aguarda resposta do destino

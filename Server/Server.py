@@ -1,13 +1,10 @@
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import json
-
-dados = {
-    "1": {"nome": "Abacaxi", "preco": "10.99", "quantidade": 10},
-    "2": {"nome": "Melancia", "preco": "8.99", "quantidade": 5},
-    "3": {"nome": "Abobora", "preco": "4.99", "quantidade": 23}
-}
+import threading
+from dadosDict import dados;
 
 
+lock = threading.Lock()
 # Define uma classe de manipulador personalizada que herda de BaseHTTPRequestHandler
 class MyHandler(BaseHTTPRequestHandler):
 
@@ -30,7 +27,7 @@ class MyHandler(BaseHTTPRequestHandler):
                 self.send_response(200)
                 self.send_header('Content-type', 'application/json')
                 self.end_headers()
-                self.wfile.write(json.dumps(dados[id_fruta]).encode('utf-8'))
+                self.wfile.write(json.dumps({id_fruta: dados[id_fruta]}).encode('utf-8'))
 
 
             else:
@@ -45,15 +42,22 @@ class MyHandler(BaseHTTPRequestHandler):
 
     # Método para lidar com solicitações POST
     def do_POST(self):
-        # Envia uma resposta com código 200 (OK)
-        self.send_response(200)
-        self.send_header('Content-type', 'application/json')
-        self.end_headers()
-        content_length = int(self.headers['Content-Length'])
-        # Lê os dados do corpo da solicitação POST
-        post_data = self.rfile.read(content_length)
-        # Escreve a resposta no corpo da mensagem, incluindo os dados POST recebidos
-        self.wfile.write(b'Hello, POST! You sent: ' + post_data)
+        partes_url = self.path.split('/')
+
+        if partes_url[1] != 'checkout' and len(partes_url) == 2:
+            with lock:
+                
+
+
+                # Envia uma resposta com código 200 (OK)
+                self.send_response(200)
+                self.send_header('Content-type', 'application/json')
+                self.end_headers()
+                content_length = int(self.headers['Content-Length'])
+                # Lê os dados do corpo da solicitação POST
+                post_data = self.rfile.read(content_length)
+                # Escreve a resposta no corpo da mensagem, incluindo os dados POST recebidos
+                self.wfile.write(b'Hello, POST! You sent: ' + post_data)
 
 # Função para executar o servidor
 
