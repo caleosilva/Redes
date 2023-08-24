@@ -37,7 +37,8 @@ def handle_client(client_socket):
                 print("Conexão fechada pelo cliente:", client_socket.getpeername())
                 break  # Sair do loop
             # data_queue.append((id, client_socket))
-            realizar_requisicoes_http(id, client_socket)
+            print(id)
+            #realizar_requisicoes_http(id, client_socket)
             
             
     except Exception as e:
