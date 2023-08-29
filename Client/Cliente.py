@@ -20,19 +20,6 @@ carrinho = {
     "10": {"nome": "Manga", "preco": 4.49, "quantidade": 1}
 }
 
-def aceitarConexao(rfid_server_socket, client_server_socket):
-    while True:
-        rfid_socket, rfid_address = rfid_server_socket.accept()
-        print("Nova conexão:", rfid_address, "\n")
-
-        # print("aceitarConexao", client_server_socket)
-
-
-        comunicacao_socket(rfid_socket, client_server_socket)
-
-        # print("aceitarConexao", client_server_socket)
-
-        
 
 def comunicacao_socket(rfid_socket, client_server_socket):
     try:
@@ -40,21 +27,20 @@ def comunicacao_socket(rfid_socket, client_server_socket):
             data = rfid_socket.recv(1024).decode()
 
             if data:
-                # print("comunicacao_socket", rfid_socket)
-
                 enviarID_receberProduto(client_server_socket, data, rfid_socket)
-                print(data)
+                # print(data)
+
                 # rfid_socket.send('ok'.encode())
 
-            # message = input("-> ")
-            # if (message):
-            #     if (message == "comprar"):
-            #         print("Compra finalizada - fazer função")
-            #     elif (message == "ver"):
-            #         for chave, valor in carrinho.items():
-            #             print(f"[{chave}] {valor['nome']}: {valor['quantidade']}")
-            #     else:
-            #         continue
+                # message = input("-> ")
+                # if (message):
+                #     if (message == "comprar"):
+                #         print("Compra finalizada - fazer função")
+                #     elif (message == "ver"):
+                #         for chave, valor in carrinho.items():
+                #             print(f"[{chave}] {valor['nome']}: {valor['quantidade']}")
+                #     else:
+                #         continue
     except socket.error as e:
         print("Erro de soquete:", e)
         rfid_socket.close()  # Fechar o socket em caso de erro
@@ -69,6 +55,7 @@ def enviarID_receberProduto(client_server_socket, data, rfid_socket):
 
     client_server_socket.send(data.encode())
     dataRcv = client_server_socket.recv(1024).decode('utf-8')
+    print(dataRcv)
     rfid_socket.send(dataRcv.encode('utf-8'))
 
     # print("dataRcv", dataRcv)
@@ -85,21 +72,27 @@ def enviarID_receberProduto(client_server_socket, data, rfid_socket):
     #     print('Produto não encontrado')
 
 def main():
-    rfid_server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    rfid_server_socket.bind((socket_rfid_client_host, socket_rfid_client_port))
-    rfid_server_socket.listen()
+    # rfid_server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    # rfid_server_socket.bind((socket_rfid_client_host, socket_rfid_client_port))
+    # rfid_server_socket.listen()
+
+    # socket_rfid_client_host = '172.16.103.6'
+    # socket_rfid_client_port = 1234
+
+    rfid_client_socket = socket.socket()
 
     client_server_socket = socket.socket()
 
     try:
         client_server_socket.connect((socket_host, socket_port))
+        rfid_client_socket.connect((socket_rfid_client_host, socket_rfid_client_port))
 
         print("Conectado ao rfid_client_socket em", socket_rfid_client_host, "porta", socket_rfid_client_port)
         print("Conectado ao client_server_socket em", socket_host, "porta", socket_port)
 
         # print('\n main: ', client_server_socket, '\n')
 
-        accept_thread = threading.Thread(target=aceitarConexao, args=(rfid_server_socket, client_server_socket))
+        accept_thread = threading.Thread(target=comunicacao_socket, args=(rfid_client_socket, client_server_socket))
         accept_thread.start()
 
     except socket.error as e:

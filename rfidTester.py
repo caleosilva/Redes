@@ -4,7 +4,7 @@ import json
 from datetime import datetime
 import mercury
 import time
-
+import threading
 
 
 def comunicacao_socket(rfid_client_socket):
@@ -83,15 +83,31 @@ def enviarListaIdFalsa(rfid_client_socket):
    
 
 def main():
+
     socket_rfid_client_host = '172.16.103.6'
     socket_rfid_client_port = 1234
+    
 
-    rfid_client_socket = socket.socket()
+    # rfid_client_socket = socket.socket()
 
     try:
-        rfid_client_socket.connect((socket_rfid_client_host, socket_rfid_client_port))
-        print("Conectado ao rfid_client_socket em", socket_rfid_client_host, "porta", socket_rfid_client_port)
-        comunicacao_socket(rfid_client_socket)
+        rfid_client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        rfid_client_socket.bind((socket_rfid_client_host, socket_rfid_client_port))
+        rfid_client_socket.listen(1)
+        print("Ouvindo em", socket_rfid_client_host, "porta", socket_rfid_client_port)
+
+
+        while True:
+            rfid_socket, rfid_address = rfid_client_socket.accept()
+
+            
+            # rfid_client_socket.connect((socket_rfid_client_host, socket_rfid_client_port))
+            # print("Conectado ao rfid_client_socket em", socket_rfid_client_host, "porta", socket_rfid_client_port)
+
+            # if (rfid_socket):
+            #     comunicacao_socket(rfid_client_socket)
+            
+
     except socket.error as e:
         print("Erro de conexão:", e)
     finally:
