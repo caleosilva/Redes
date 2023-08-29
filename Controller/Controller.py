@@ -33,11 +33,12 @@ def handle_client(client_socket):
 
         while True:  # Mantém o socket aberto para receber novos IDs continuamente
             id = client_socket.recv(1024).decode('utf-8')
-            if not id:  # Se o cliente fechou a conexão
-                print("Conexão fechada pelo cliente:", client_socket.getpeername())
-                break  # Sair do loop
+            if id:  # Se o cliente fechou a conexão
+                # print(id)
+                realizar_requisicoes_http(id, client_socket)
+
             # data_queue.append((id, client_socket))
-            print(id)
+            # print(id)
             #realizar_requisicoes_http(id, client_socket)
             
             
