@@ -42,9 +42,9 @@ def comunicacao_socket(rfid_socket, client_server_socket):
             if data:
                 # print("comunicacao_socket", rfid_socket)
 
-                enviarID_receberProduto(client_server_socket, data)
+                enviarID_receberProduto(client_server_socket, data, rfid_socket)
                 print(data)
-                rfid_socket.send('ok'.encode())
+                # rfid_socket.send('ok'.encode())
 
             # message = input("-> ")
             # if (message):
@@ -65,11 +65,13 @@ def comunicacao_socket(rfid_socket, client_server_socket):
         client_server_socket.close()
 
 
-def enviarID_receberProduto(client_server_socket, data):
+def enviarID_receberProduto(client_server_socket, data, rfid_socket):
 
-    client_server_socket.send(data.encode('utf-8'))
+    client_server_socket.send(data.encode())
     dataRcv = client_server_socket.recv(1024).decode('utf-8')
-    print("dataRcv", dataRcv)
+    rfid_socket.send(dataRcv.encode('utf-8'))
+
+    # print("dataRcv", dataRcv)
     # if (dataRcv != "204"):
     #     data_dict = json.loads(dataRcv)
 

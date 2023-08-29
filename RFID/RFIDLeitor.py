@@ -6,7 +6,6 @@ import mercury
 import time
 
 
-
 def comunicacao_socket(rfid_client_socket):
     try:
         ultimo_tempo_leitura = {}
@@ -36,9 +35,6 @@ def enviarId(rfid_client_socket, ultimo_tempo_leitura):
     # nao altere a potencia do sinal para nao prejudicar a placa
     reader.set_read_plan([1], "GEN2", read_power=param)
 
-    # realiza a leitura das TAGs proximas e imprime na tela
-    # print(reader.read())
-
     epcs = map(lambda tag: tag, reader.read())
     for tag in epcs:
         encoded_id = (tag.epc).decode()
@@ -50,19 +46,6 @@ def enviarId(rfid_client_socket, ultimo_tempo_leitura):
             rfid_client_socket.send(encoded_id.encode())
             confirmacao = rfid_client_socket.recv(1024).decode('utf-8')
             print(confirmacao)
-
-        
-
-        # rfid_client_socket.send(tag.epc)
-        # confirmacao = rfid_client_socket.recv(1024).decode('utf-8')
-        # print(confirmacao)
-
-
-        # stringTag = (tag.epc).decode("utf-8")
-
-        # rfid_client_socket.send(stringTag.encode('utf-8'))
-        # confirmacao = rfid_client_socket.recv(1024).decode('utf-8')
-        # print(confirmacao)
 
 def enviarListaIdFalsa(rfid_client_socket):   
     contador = 0
