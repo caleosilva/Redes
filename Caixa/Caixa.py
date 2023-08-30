@@ -16,13 +16,14 @@ carrinho = {
 def mostrarCarrinho():
     os.system('clear')
     totalItens = len(carrinho)
+    valorTotal = 0
     if(totalItens > 0):
         print('-=-=-= Carrinho =-=-=-')
-        valorTotal = 0
         for chave, valor in carrinho.items():
-            print(f"[{chave}] {valor['nome']}: {valor['quantidade']}")
-            valorTotal += valor['preco']
-        print(f"Preço total: R$ {valorTotal}")
+            print(f"[{chave}] {valor['nome']} (R$ {valor['preco']}): {valor['quantidade']} unidades")
+            # print(valor['preco'])
+            valorTotal += valor['preco'] * valor['quantidade']
+        print(f"\nPreço total: R$ {valorTotal:.2f}")
     else:
         print("O carrinho está vazio.")
     print('\n\n')
