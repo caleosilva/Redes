@@ -13,8 +13,23 @@ carrinho = {
     '1': {"nome": "Whey", "preco": 1.99, "quantidade": 1}
 }
 
+def enviar_grandes_dados(client_server_socket, data, rfid_socket):
+    serialized_data = json.dumps(data)
+    data_size = len(serialized_data)
+    client_server_socket.send(str(data_size).encode())  # Envia o tamanho dos dados
+
+    ack = client_server_socket.recv(1024)  # Espera por um ack do servidor
+    if ack.decode() == 'OK':
+        sent_bytes = 0
+        while sent_bytes < data_size:
+            remaining_data = serialized_data[sent_bytes:]
+            bytes_to_send = min(1024, data_size - sent_bytes)
+            client_server_socket.send(remaining_data[:bytes_to_send].encode())
+            sent_bytes += bytes_to_send
+        print("Dados enviados com sucesso!")
+
 def mostrarCarrinho():
-    os.system('clear')
+    # os.system('clear')
     totalItens = len(carrinho)
     valorTotal = 0
     if(totalItens > 0):
@@ -36,6 +51,8 @@ def comunicacao_socket(rfid_socket, client_server_socket):
 
             if data:
                 if (data['header'] == 'comprar'):
+                    data['body'] = carrinho
+                    enviar_grandes_dados(client_server_socket, data, rfid_socket)
                     rfid_socket.send('compra finalizada'.encode('utf-8'))
                 elif (data['header'] == 'id'):
                     enviarID_receberProduto(client_server_socket, data, rfid_socket)
@@ -48,7 +65,6 @@ def comunicacao_socket(rfid_socket, client_server_socket):
         print("Cliente interrompido pelo usuário.")
         rfid_socket.close()  # Fechar o socket em caso de interrupção
         client_server_socket.close()
-
 
 def enviarID_receberProduto(client_server_socket, data, rfid_socket):
     data_serialized = json.dumps(data)  # Serializa o dicionário em JSON
@@ -67,7 +83,8 @@ def enviarID_receberProduto(client_server_socket, data, rfid_socket):
                 carrinho[chave] = valor
                 carrinho[chave]['quantidade'] = 1
 
-
+def enviarCarrinho():
+    pass
 
 def main():
     rfid_client_socket = socket.socket()
