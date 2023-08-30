@@ -11,11 +11,8 @@ from config import server_host, socket_host, socket_port
 import json
 
 
-
-
 # {client_socket: True, client_socket: True, client_socket: False}
 conexoes = {}
-
 
 def aceitar_conexoes(server_socket, ):
     while True:
@@ -23,25 +20,16 @@ def aceitar_conexoes(server_socket, ):
         conexoes[client_socket] = True
 
         print("Nova conexão:", client_address, "\n")
-        # print("conexoes:", conexoes, "\n")
 
         client_thread = threading.Thread(target=handle_client, args=(client_socket, ))
         client_thread.start()
 
 def handle_client(client_socket):
     try:
-
         while True:  # Mantém o socket aberto para receber novos IDs continuamente
             id = client_socket.recv(1024).decode('utf-8')
             if id:  # Se o cliente fechou a conexão
-                # print(id)
                 realizar_requisicoes_http(id, client_socket)
-
-            # data_queue.append((id, client_socket))
-            # print(id)
-            #realizar_requisicoes_http(id, client_socket)
-            
-            
     except Exception as e:
         print("Erro ao lidar com o cliente:", e)
     finally:
@@ -78,15 +66,12 @@ def main():
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     server_socket.bind((host, port))
     server_socket.listen()
-    print("Já estou ouvindo o socket em", host, "na", port)
 
-    # data_queue = deque()
+    print("Já estou ouvindo o socket em", host, "na", port)
 
     accept_thread = threading.Thread(target=aceitar_conexoes, args=(server_socket, ))
     accept_thread.start()
 
-    # http_request_thread = threading.Thread(target=realizar_requisicoes_http, args=(data_queue,))
-    # http_request_thread.start()
 
 if __name__ == "__main__":
     main()
