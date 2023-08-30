@@ -31,20 +31,15 @@ def mostrarCarrinho():
 def comunicacao_socket(rfid_socket, client_server_socket):
     try:
         while True:
-            data = rfid_socket.recv(1024).decode('utf-8')
+            dados_recebidos = rfid_socket.recv(1024).decode()
+            data = json.loads(dados_recebidos)
 
             if data:
-                if (data == 'comprar'):
-                    print('Fazer função de comprar')
+                if (data['header'] == 'comprar'):
                     rfid_socket.send('compra finalizada'.encode('utf-8'))
-                else:
-                    print('chegou')
+                elif (data['header'] == 'id'):
                     enviarID_receberProduto(client_server_socket, data, rfid_socket)
-                # rfid_socket.send('visualizado'.encode('utf-8'))
             mostrarCarrinho()
-
-
-                
     except socket.error as e:
         print("Erro de soquete:", e)
         rfid_socket.close()  # Fechar o socket em caso de erro
@@ -56,13 +51,13 @@ def comunicacao_socket(rfid_socket, client_server_socket):
 
 
 def enviarID_receberProduto(client_server_socket, data, rfid_socket):
-
-    client_server_socket.send(data.encode())
+    data_serialized = json.dumps(data)  # Serializa o dicionário em JSON
+    client_server_socket.send(data_serialized.encode())  # Envia os dados serializados
     dataRcv = client_server_socket.recv(1024).decode('utf-8')
     rfid_socket.send(dataRcv.encode('utf-8'))
 
     if (dataRcv == "204"):
-        print('Produto não encontrado')
+        pass
     else:
         data_dict = json.loads(dataRcv)
         for chave, valor in data_dict.items():
@@ -71,7 +66,7 @@ def enviarID_receberProduto(client_server_socket, data, rfid_socket):
             else:
                 carrinho[chave] = valor
                 carrinho[chave]['quantidade'] = 1
-            print(f"O produto '{carrinho[chave]['nome']}' foi adicionado ao carrinho!")
+
 
 
 def main():

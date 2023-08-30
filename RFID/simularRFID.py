@@ -28,13 +28,28 @@ def enviarId(rfid_client_socket, ultimo_tempo_leitura):
 
     inputData = input('-> ')
 
-    tempo_atual = time.time()
-    if ((inputData not in ultimo_tempo_leitura) or (tempo_atual - ultimo_tempo_leitura[inputData]) > 0.1):
-        ultimo_tempo_leitura[inputData] = tempo_atual
+    if (inputData == ''):
+        pass
+    elif (inputData == 'comprar'):
+        dados_serializados = json.dumps({'header':'comprar', 'body': False})
 
-        rfid_client_socket.send(inputData.encode('utf-8'))
+        rfid_client_socket.send(dados_serializados.encode('utf-8'))
         confirmacao = rfid_client_socket.recv(1024).decode('utf-8')
-        print("ok")
+        print(confirmacao)
+    else:
+        dados_serializados = json.dumps({'header':'id', 'body': inputData})
+        tempo_atual = time.time()
+
+
+        if ((inputData not in ultimo_tempo_leitura) or (tempo_atual - ultimo_tempo_leitura[inputData]) > 0.1):
+            ultimo_tempo_leitura[inputData] = tempo_atual
+
+            rfid_client_socket.send(dados_serializados.encode('utf-8'))
+            confirmacao = rfid_client_socket.recv(1024).decode('utf-8')
+            print(confirmacao)
+
+
+    
 
 
 def main():

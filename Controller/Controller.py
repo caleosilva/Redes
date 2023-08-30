@@ -27,9 +27,10 @@ def aceitar_conexoes(server_socket, ):
 def handle_client(client_socket):
     try:
         while True:  # Mantém o socket aberto para receber novos IDs continuamente
-            id = client_socket.recv(1024).decode('utf-8')
-            if id:  # Se o cliente fechou a conexão
-                realizar_requisicoes_http(id, client_socket)
+            data = client_socket.recv(1024).decode()
+            dataJson = json.loads(data)
+            if (dataJson['header'] == 'id'):  # Se o cliente fechou a conexão
+                realizar_requisicoes_http(dataJson, client_socket)
     except Exception as e:
         print("Erro ao lidar com o cliente:", e)
     finally:
@@ -38,12 +39,12 @@ def handle_client(client_socket):
         client_socket.close()  # Fechar o socket
 
 
-def realizar_requisicoes_http(id, client_socket):
+def realizar_requisicoes_http(dataJson, client_socket):
     try:
         if not conexoes.get(client_socket):
             client_socket.send("Caixa bloqueado".encode('utf-8'))
         else:
-            response = requests.get(server_host + id)
+            response = requests.get(server_host + dataJson['body'])
 
             if (response.status_code == 204):
                 mensagem = "204"
@@ -52,7 +53,7 @@ def realizar_requisicoes_http(id, client_socket):
             elif (response.status_code == 200):                
                 data_dict = response.json()
                 data = json.dumps(data_dict)
-                client_socket.send(data.encode('utf-8'))
+                client_socket.send(data.encode())
 
             else:
                 client_socket.send("Erro".encode('utf-8'))
