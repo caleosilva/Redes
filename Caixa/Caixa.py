@@ -9,33 +9,7 @@ sys.path.append(parent_dir)
 
 from config import socket_host, socket_port, socket_rfid_client_host, socket_rfid_client_port
 
-carrinho = {
-    # '5': {"nome": "Batata", "preco": 6.99, "quantidade": 1}
-}
-
-def menu(client_server_socket):
-    continuar = True
-
-    while continuar:
-        print('\n\n-=-=-=-= MENU =-=-=-=-')
-        print('[1] -> Inserir código manualmente')
-        print('[2] -> Ler RFID')
-        print('[3] -> Visualizar carrinho')
-        print('[4] -> Finalizar compra')
-
-        escolha = input('\nOpção -> ')
-
-        if (escolha == '1'):
-            produtoID = enviar_ID_manualmente(client_server_socket)
-            adicionar_produto_carrinho(produtoID)
-        elif (escolha == '2'):
-            solicitar_tags_RFID()
-        elif (escolha == '3'):
-            mostrarCarrinho()
-        elif (escolha == '4'):
-            print('4')
-        else:
-            print('Opção inválida!')
+carrinho = {}
 
 def enviar_ID_manualmente(client_server_socket):
     inputData = input('ID -> ')
@@ -117,24 +91,49 @@ def comunicacao_socket(rfid_socket, client_server_socket):
         client_server_socket.close()
 
 def solicitar_tags_RFID():
-    rfid_caixa_socket = socket.socket()
-    rfid_caixa_socket.connect((socket_rfid_client_host, socket_rfid_client_port))
-    print("Conectado ao rfid_caixa_socket em", socket_rfid_client_host, "porta", socket_rfid_client_port)
+    try:
+        rfid_caixa_socket = socket.socket()
+        rfid_caixa_socket.connect((socket_rfid_client_host, socket_rfid_client_port))
+        dadosRcv = rfid_caixa_socket.recv(1024).decode()
+        return json.loads(dadosRcv)
+    except socket.error as e:
+        print("\nNão foi possível se conectar com o RFID.")
 
-    dadosRcv = rfid_caixa_socket.recv(1024).decode()
-    print(dadosRcv)
+def menu(client_server_socket):
+    continuar = True
 
+    while continuar:
+        print('\n\n-=-=-=-= MENU =-=-=-=-')
+        print('[1] -> Inserir código manualmente')
+        print('[2] -> Ler RFID')
+        print('[3] -> Visualizar carrinho')
+        print('[4] -> Finalizar compra')
+
+        escolha = input('\nOpção -> ')
+
+        if (escolha == '1'):
+            produtoID = enviar_ID_manualmente(client_server_socket)
+            adicionar_produto_carrinho(produtoID)
+        elif (escolha == '2'):
+            listaRFID = solicitar_tags_RFID()
+            if(len(listaRFID) > 0):
+                for id in listaRFID:
+                    inputDataDict = {'header':'id', 'body': id}
+                    dataRcv = send_receive_data(client_server_socket, inputDataDict)
+                    adicionar_produto_carrinho(dataRcv)
+        elif (escolha == '3'):
+            mostrarCarrinho()
+        elif (escolha == '4'):
+            print('4')
+        else:
+            print('Opção inválida!')
 
 def main():
-    # rfid_caixa_socket = socket.socket()
     caixa_controller_socket = socket.socket()
 
     try:
         caixa_controller_socket.connect((socket_host, socket_port))
         print("Conectado ao caixa_controller_socket em", socket_host, "porta", socket_port)
-
-        # rfid_caixa_socket.connect((socket_rfid_client_host, socket_rfid_client_port))
-        # print("Conectado ao rfid_caixa_socket em", socket_rfid_client_host, "porta", socket_rfid_client_port)
 
         accept_thread = threading.Thread(target=menu, args=(caixa_controller_socket,))
         accept_thread.start()
