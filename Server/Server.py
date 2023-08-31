@@ -43,23 +43,25 @@ class MyHandler(BaseHTTPRequestHandler):
     # Método para lidar com solicitações POST
     def do_POST(self):
         partes_url = self.path.split('/')
+        content_length = int(self.headers['Content-Length'])
+        dadosBody = self.rfile.read(content_length)
+        
+        print(dadosBody.decode())
+        print(type(dadosBody.decode()))
+        dadosJson = json.loads(dadosBody.decode())
+        print(dadosJson)
+        # dadosJson = json.dumps(dadosBody)
+        # print(dadosJson)
 
-        if partes_url[1] != 'checkout' and len(partes_url) == 2:
+        if partes_url[1] == 'comprar':
             with lock:
-                
-
-
-                # Envia uma resposta com código 200 (OK)
-                self.send_response(200)
-                self.send_header('Content-type', 'application/json')
-                self.end_headers()
-                content_length = int(self.headers['Content-Length'])
-                # Lê os dados do corpo da solicitação POST
-                post_data = self.rfile.read(content_length)
-                # Escreve a resposta no corpo da mensagem, incluindo os dados POST recebidos
-                self.wfile.write(b'Hello, POST! You sent: ' + post_data)
-
-# Função para executar o servidor
+                for chave, valor in dadosJson.items():
+                    if (dados[chave]['quantidade'] >= valor['quantidade']):
+                        dados[chave]['quantidade'] -= valor['quantidade']
+            self.send_response(201)
+            self.send_header('Content-type', 'application/json')
+            self.end_headers()
+            self.wfile.write(json.dumps({"statusCompra": "Compra finalizada com sucesso."}))
 
 
 def run(server_class=HTTPServer, handler_class=MyHandler, port=8000):

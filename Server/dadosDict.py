@@ -9,8 +9,8 @@ dados = {
     'E2000017221101241890547C': {"nome": "Pera", "preco": 2.99, "quantidade": 18},
     'E2000017221100961890544A': {"nome": "Kiwi", "preco": 6.99, "quantidade": 7},
     '1': {"nome": "Whey", "preco": 1.99, "quantidade": 0},
-    '2': {"nome": "Creatina", "preco": 3.99, "quantidade": 12},
-    '3': {"nome": "HiperCalorico", "preco": 5.99, "quantidade": 8},
-    '4': {"nome": "Ovo", "preco": 2.99, "quantidade": 18},
-    '5': {"nome": "Batata", "preco": 6.99, "quantidade": 7}
+    '2': {"nome": "Creatina", "preco": 3.99, "quantidade": 10},
+    '3': {"nome": "HiperCalorico", "preco": 5.99, "quantidade": 10},
+    '4': {"nome": "Ovo", "preco": 2.99, "quantidade": 20},
+    '5': {"nome": "Batata", "preco": 6.99, "quantidade": 20}
 }

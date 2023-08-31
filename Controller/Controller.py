@@ -10,8 +10,6 @@ import requests
 from config import server_host, socket_host, socket_port
 import json
 
-
-# {client_socket: True, client_socket: True, client_socket: False}
 conexoes = {}
 
 def aceitar_conexoes(server_socket):
@@ -41,9 +39,9 @@ def handle_client(client_socket):
         while True: 
             dataJson = receive_large_data(client_socket)
             if (dataJson['header'] == 'id'):
-                realizar_requisicoes_http(dataJson, client_socket)
+                realizar_requisicao_GET(dataJson, client_socket)
             elif (dataJson['header'] == 'comprar'):
-                client_socket.send('Recebi o carrinho'.encode())
+                realizar_requisicao_POST(dataJson, client_socket)
     except Exception as e:
         print("Erro ao lidar com o cliente:", e)
     finally:
@@ -52,7 +50,7 @@ def handle_client(client_socket):
         client_socket.close()  # Fechar o socket
 
 
-def realizar_requisicoes_http(dataJson, client_socket):
+def realizar_requisicao_GET(dataJson, client_socket):
     try:
         if not conexoes.get(client_socket):
             client_socket.send("Caixa bloqueado".encode('utf-8'))
@@ -71,7 +69,27 @@ def realizar_requisicoes_http(dataJson, client_socket):
             else:
                 client_socket.send("Erro".encode('utf-8'))
     except Exception as e:
-        print("Erro ao fazer a solicitação HTTP:", e)
+        print("Erro ao fazer a solicitação HTTP-GET:", e)
+
+def realizar_requisicao_POST(dataJson, client_socket):
+    try:
+        if not conexoes.get(client_socket):
+            client_socket.send("Caixa bloqueado".encode('utf-8'))
+        else:
+            response = requests.post(server_host + dataJson['header'], json=dataJson['body'])
+
+            if (response.status_code == 400):
+                mensagem = "400"
+                client_socket.send(mensagem.encode('utf-8'))
+
+            elif (response.status_code == 201):
+                client_socket.send((response.status_code).encode())
+
+            else:
+                print(response)
+                client_socket.send("Erro".encode('utf-8'))
+    except Exception as e:
+        print("Erro ao fazer a solicitação HTTP-POST:", e)
 
 def main():
     host = socket_host
