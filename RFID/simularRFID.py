@@ -4,6 +4,12 @@ import json
 from datetime import datetime
 # import mercury
 import time
+import os
+
+parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.append(parent_dir)
+
+from config import socket_host, socket_port, socket_rfid_client_host, socket_rfid_client_port
 
 
 def aceitar_conexoes(rfid_client_socket):
@@ -48,13 +54,8 @@ def enviarId(rfid_client_socket, ultimo_tempo_leitura):
             print(confirmacao)
 
 
-    
-
-
 def main():
     # socket_rfid_client_host = '172.16.103.0'
-    socket_rfid_client_host = '127.0.0.1'
-    socket_rfid_client_port = 1235
 
     try:
         rfid_client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)

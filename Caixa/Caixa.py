@@ -10,24 +10,19 @@ sys.path.append(parent_dir)
 from config import socket_host, socket_port, socket_rfid_client_host, socket_rfid_client_port
 
 carrinho = {
-    '1': {"nome": "Whey", "preco": 1.99, "quantidade": 1},
-    '2': {"nome": "A", "preco": 1.99, "quantidade": 2},
-    '3': {"nome": "B", "preco": 1.99, "quantidade": 3}
+    '5': {"nome": "Batata", "preco": 6.99, "quantidade": 5}
 }
 
-def enviar_carrinho(client_server_socket, data):
+def send_receive_data(socket, data):
     serialized_data = json.dumps(data)
     data_size = len(serialized_data)
-    client_server_socket.send(str(data_size).encode())  # Envia o tamanho dos dados
-
-    ack = client_server_socket.recv(1024)  # Espera por um ack do servidor
+    
+    socket.send(str(data_size).encode())  # Envia o tamanho dos dados
+    
+    ack = socket.recv(1024)  # Espera por um ack do servidor
     if ack.decode() == 'OK':
-        sent_bytes = 0
-        while sent_bytes < data_size:
-            remaining_data = serialized_data[sent_bytes:]
-            bytes_to_send = min(1024, data_size - sent_bytes)
-            client_server_socket.send(remaining_data[:bytes_to_send].encode())
-            sent_bytes += bytes_to_send
+        socket.sendall(serialized_data.encode())
+        return socket.recv(1024).decode('utf-8')
 
 def mostrarCarrinho():
     os.system('clear')
@@ -50,11 +45,12 @@ def adicionar_produto_carrinho(produto):
     else:
         data_dict = json.loads(produto)
         for chave, valor in data_dict.items():
-            if chave in carrinho:
-                carrinho[chave]['quantidade'] += 1
-            else:
-                carrinho[chave] = valor
-                carrinho[chave]['quantidade'] = 1
+            if (valor['quantidade'] > 0):
+                if (chave in carrinho and carrinho[chave]['quantidade'] < valor['quantidade']):
+                    carrinho[chave]['quantidade'] += 1
+                elif (chave not in carrinho):
+                    carrinho[chave] = valor
+                    carrinho[chave]['quantidade'] = 1
 
 def comunicacao_socket(rfid_socket, client_server_socket):
     try:
@@ -65,10 +61,11 @@ def comunicacao_socket(rfid_socket, client_server_socket):
             if data:
                 if (data['header'] == 'comprar'):
                     data['body'] = carrinho
-                    enviar_carrinho(client_server_socket, data)
+                    data = send_receive_data(client_server_socket, data)
                     rfid_socket.send('compra finalizada'.encode('utf-8'))
                 elif (data['header'] == 'id'):
-                    produtoInfo = solicitar_info_produto(client_server_socket, data)
+                    produtoInfo = send_receive_data(client_server_socket, data)
+
                     adicionar_produto_carrinho(produtoInfo)
                     rfid_socket.send(produtoInfo.encode('utf-8'))
 
@@ -82,38 +79,6 @@ def comunicacao_socket(rfid_socket, client_server_socket):
         rfid_socket.close()  # Fechar o socket em caso de interrupção
         client_server_socket.close()
 
-def solicitar_info_produto(client_server_socket, data):
-    serialized_data = json.dumps(data)
-    data_size = len(serialized_data)
-    client_server_socket.send(str(data_size).encode())  # Envia o tamanho dos dados
-
-    ack = client_server_socket.recv(1024)  # Espera por um ack do servidor
-    if ack.decode() == 'OK':
-        sent_bytes = 0
-        while sent_bytes < data_size:
-            remaining_data = serialized_data[sent_bytes:]
-            bytes_to_send = min(1024, data_size - sent_bytes)
-            client_server_socket.send(remaining_data[:bytes_to_send].encode())
-            sent_bytes += bytes_to_send
-
-    return client_server_socket.recv(1024).decode('utf-8')
-
-# def solicitar_produto_id(client_server_socket, data, rfid_socket):
-#     data_serialized = json.dumps(data)  # Serializa o dicionário em JSON
-#     client_server_socket.send(data_serialized.encode())  # Envia os dados serializados
-#     dataRcv = client_server_socket.recv(1024).decode('utf-8')
-#     rfid_socket.send(dataRcv.encode('utf-8'))
-
-#     if (dataRcv == "204"):
-#         pass
-#     else:
-#         data_dict = json.loads(dataRcv)
-#         for chave, valor in data_dict.items():
-#             if chave in carrinho:
-#                 carrinho[chave]['quantidade'] += 1
-#             else:
-#                 carrinho[chave] = valor
-#                 carrinho[chave]['quantidade'] = 1
 
 
 def main():

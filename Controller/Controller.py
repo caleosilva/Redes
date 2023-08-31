@@ -14,7 +14,7 @@ import json
 # {client_socket: True, client_socket: True, client_socket: False}
 conexoes = {}
 
-def aceitar_conexoes(server_socket, ):
+def aceitar_conexoes(server_socket):
     while True:
         client_socket, client_address = server_socket.accept()
         conexoes[client_socket] = True
@@ -27,27 +27,23 @@ def aceitar_conexoes(server_socket, ):
 def receive_large_data(sock):
     data_size = int(sock.recv(1024).decode())  # Recebe o tamanho dos dados
     sock.send('OK'.encode())  # Envia um ack para o cliente
-
+    
     received_data = ''
     while len(received_data) < data_size:
         remaining_bytes = data_size - len(received_data)
         received_data_chunk = sock.recv(min(1024, remaining_bytes)).decode()
         received_data += received_data_chunk
+    
     return json.loads(received_data)
 
 def handle_client(client_socket):
     try:
-        while True:  # Mantém o socket aberto para receber novos IDs continuamente
-            # data = client_socket.recv(1024).decode()
-            # dataJson = json.loads(data)
-
+        while True: 
             dataJson = receive_large_data(client_socket)
             if (dataJson['header'] == 'id'):
                 realizar_requisicoes_http(dataJson, client_socket)
             elif (dataJson['header'] == 'comprar'):
-                print(dataJson)
                 client_socket.send('Recebi o carrinho'.encode())
-
     except Exception as e:
         print("Erro ao lidar com o cliente:", e)
     finally:

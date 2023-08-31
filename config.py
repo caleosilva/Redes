@@ -4,6 +4,6 @@ socket_port = 3434
 
 # socket_rfid_client_host = '172.16.103.0'
 socket_rfid_client_host = '127.0.0.1'
-socket_rfid_client_port = 1235
+socket_rfid_client_port = 1234
 
 server_host = 'http://localhost:8000/'
