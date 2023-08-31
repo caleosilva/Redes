@@ -24,17 +24,29 @@ def aceitar_conexoes(server_socket, ):
         client_thread = threading.Thread(target=handle_client, args=(client_socket, ))
         client_thread.start()
 
+def receive_large_data(sock):
+    data_size = int(sock.recv(1024).decode())  # Recebe o tamanho dos dados
+    sock.send('OK'.encode())  # Envia um ack para o cliente
+
+    received_data = ''
+    while len(received_data) < data_size:
+        remaining_bytes = data_size - len(received_data)
+        received_data_chunk = sock.recv(min(1024, remaining_bytes)).decode()
+        received_data += received_data_chunk
+    return json.loads(received_data)
+
 def handle_client(client_socket):
     try:
         while True:  # Mantém o socket aberto para receber novos IDs continuamente
-            data = client_socket.recv(1024).decode()
-            # dataJson = receive_large_data(client_socket)
-            dataJson = json.loads(data)
+            # data = client_socket.recv(1024).decode()
+            # dataJson = json.loads(data)
+
+            dataJson = receive_large_data(client_socket)
             if (dataJson['header'] == 'id'):
                 realizar_requisicoes_http(dataJson, client_socket)
             elif (dataJson['header'] == 'comprar'):
                 print(dataJson)
-                client_socket.send('recebi'.encode())
+                client_socket.send('Recebi o carrinho'.encode())
 
     except Exception as e:
         print("Erro ao lidar com o cliente:", e)
@@ -64,17 +76,6 @@ def realizar_requisicoes_http(dataJson, client_socket):
                 client_socket.send("Erro".encode('utf-8'))
     except Exception as e:
         print("Erro ao fazer a solicitação HTTP:", e)
-
-def receive_large_data(sock):
-    data_size = int(sock.recv(1024).decode())  # Recebe o tamanho dos dados
-    sock.send('OK'.encode())  # Envia um ack para o cliente
-
-    received_data = ''
-    while len(received_data) < data_size:
-        remaining_bytes = data_size - len(received_data)
-        received_data_chunk = sock.recv(min(1024, remaining_bytes)).decode()
-        received_data += received_data_chunk
-    return json.loads(received_data)
 
 def main():
     host = socket_host

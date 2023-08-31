@@ -40,7 +40,6 @@ def enviarId(rfid_client_socket, ultimo_tempo_leitura):
         dados_serializados = json.dumps({'header':'id', 'body': inputData})
         tempo_atual = time.time()
 
-
         if ((inputData not in ultimo_tempo_leitura) or (tempo_atual - ultimo_tempo_leitura[inputData]) > 0.1):
             ultimo_tempo_leitura[inputData] = tempo_atual
 
