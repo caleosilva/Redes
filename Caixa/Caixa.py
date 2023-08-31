@@ -10,8 +10,42 @@ sys.path.append(parent_dir)
 from config import socket_host, socket_port, socket_rfid_client_host, socket_rfid_client_port
 
 carrinho = {
-    '5': {"nome": "Batata", "preco": 6.99, "quantidade": 5}
+    # '5': {"nome": "Batata", "preco": 6.99, "quantidade": 1}
 }
+
+def menu(client_server_socket):
+    continuar = True
+
+    while continuar:
+        print('\n\n-=-=-=-= MENU =-=-=-=-')
+        print('[1] -> Inserir código manualmente')
+        print('[2] -> Ler RFID')
+        print('[3] -> Visualizar carrinho')
+        print('[4] -> Finalizar compra')
+
+        escolha = input('\nOpção -> ')
+
+        if (escolha == '1'):
+            produtoID = enviar_ID_manualmente(client_server_socket)
+            adicionar_produto_carrinho(produtoID)
+        elif (escolha == '2'):
+            solicitar_tags_RFID()
+        elif (escolha == '3'):
+            mostrarCarrinho()
+        elif (escolha == '4'):
+            print('4')
+        else:
+            print('Opção inválida!')
+
+def enviar_ID_manualmente(client_server_socket):
+    inputData = input('ID -> ')
+
+    if (inputData == ''):
+        print("ID inválido!\n")
+    else:
+        inputDataDict = {'header':'id', 'body': inputData}
+        dataRcv = send_receive_data(client_server_socket, inputDataDict)
+        return dataRcv
 
 def send_receive_data(socket, data):
     serialized_data = json.dumps(data)
@@ -25,19 +59,17 @@ def send_receive_data(socket, data):
         return socket.recv(1024).decode('utf-8')
 
 def mostrarCarrinho():
-    os.system('clear')
     totalItens = len(carrinho)
     valorTotal = 0
     if(totalItens > 0):
-        print('-=-=-= Carrinho =-=-=-')
+        print('\n-=-=-= CARRINHO =-=-=-')
         for chave, valor in carrinho.items():
             print(f"[{chave}] {valor['nome']} (R$ {valor['preco']}): {valor['quantidade']} unidades")
             # print(valor['preco'])
             valorTotal += valor['preco'] * valor['quantidade']
         print(f"\nPreço total: R$ {valorTotal:.2f}")
     else:
-        print("O carrinho está vazio.")
-    print('\n\n')
+        print("\nO carrinho está vazio.")
 
 def adicionar_produto_carrinho(produto):
     if (produto == "204"):
@@ -48,9 +80,14 @@ def adicionar_produto_carrinho(produto):
             if (valor['quantidade'] > 0):
                 if (chave in carrinho and carrinho[chave]['quantidade'] < valor['quantidade']):
                     carrinho[chave]['quantidade'] += 1
+                    print(f"\nO produto '{valor['nome']}' foi adicionado ao carrinho.")
                 elif (chave not in carrinho):
                     carrinho[chave] = valor
                     carrinho[chave]['quantidade'] = 1
+                    print(f"\nO produto '{valor['nome']}' foi adicionado ao carrinho.")
+
+            else:
+                print(f'\nO produto {valor["nome"]} não tem estoque!')
 
 def comunicacao_socket(rfid_socket, client_server_socket):
     try:
@@ -79,20 +116,27 @@ def comunicacao_socket(rfid_socket, client_server_socket):
         rfid_socket.close()  # Fechar o socket em caso de interrupção
         client_server_socket.close()
 
+def solicitar_tags_RFID():
+    rfid_caixa_socket = socket.socket()
+    rfid_caixa_socket.connect((socket_rfid_client_host, socket_rfid_client_port))
+    print("Conectado ao rfid_caixa_socket em", socket_rfid_client_host, "porta", socket_rfid_client_port)
+
+    dadosRcv = rfid_caixa_socket.recv(1024).decode()
+    print(dadosRcv)
 
 
 def main():
-    rfid_client_socket = socket.socket()
-    client_server_socket = socket.socket()
+    # rfid_caixa_socket = socket.socket()
+    caixa_controller_socket = socket.socket()
 
     try:
-        client_server_socket.connect((socket_host, socket_port))
-        rfid_client_socket.connect((socket_rfid_client_host, socket_rfid_client_port))
+        caixa_controller_socket.connect((socket_host, socket_port))
+        print("Conectado ao caixa_controller_socket em", socket_host, "porta", socket_port)
 
-        print("Conectado ao rfid_client_socket em", socket_rfid_client_host, "porta", socket_rfid_client_port)
-        print("Conectado ao client_server_socket em", socket_host, "porta", socket_port)
+        # rfid_caixa_socket.connect((socket_rfid_client_host, socket_rfid_client_port))
+        # print("Conectado ao rfid_caixa_socket em", socket_rfid_client_host, "porta", socket_rfid_client_port)
 
-        accept_thread = threading.Thread(target=comunicacao_socket, args=(rfid_client_socket, client_server_socket))
+        accept_thread = threading.Thread(target=menu, args=(caixa_controller_socket,))
         accept_thread.start()
     except socket.error as e:
         print("Erro de conexão:", e)
