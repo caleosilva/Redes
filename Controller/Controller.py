@@ -51,15 +51,26 @@ def handle_client(client_socket):
             elif (dataJson['header'] == 'caixas'):
                 if (dataJson['body'] == ''):
                     url = server_host + dataJson['header']
+                    realizar_requisicao_GET(url, client_socket)
                 else:
                     url = server_host + dataJson['header'] + '/' + dataJson['body']
-                realizar_requisicao_GET(url, client_socket)
+                    resultado = realizar_requisicao_GET(url, client_socket)
+                    
+                    if (resultado[dataJson['body']]['ativo'] == False):
+                        body = {'ativo': True}
+                        urlManipulacao = server_host + "gerenciarCaixa" + '/' + dataJson['body']
+                        alterarOcupacaoCaixa(urlManipulacao, body)
     except Exception as e:
         print("Erro ao lidar com o cliente:", e)
+
+        urlManipulacao = server_host + "gerenciarCaixa" + '/' + dataJson['body']
+        alterarOcupacaoCaixa(urlManipulacao, body)
+        client_socket.close()
     finally:
-        if client_socket in conexoes:
-            del conexoes[client_socket]  # Remover a conexão do dicionário
-        client_socket.close()  # Fechar o socket
+        body = {'ativo': False}
+        urlManipulacao = server_host + "gerenciarCaixa" + '/' + dataJson['body']
+        alterarOcupacaoCaixa(urlManipulacao, body)
+        client_socket.close()
 
 def verificarBloqueioCaixa(dataJson):
     codigoDoCaixa = dataJson['codigoDoCaixa']
@@ -79,22 +90,21 @@ def verificarBloqueioCaixa(dataJson):
 
 def realizar_requisicao_GET(url, client_socket):
     try:
-        if not conexoes.get(client_socket):
-            client_socket.send("Caixa bloqueado".encode('utf-8'))
+        response = requests.get(url)
+
+        if (response.status_code == 204):
+            mensagem = "204"
+            client_socket.send(mensagem.encode('utf-8'))
+
+        elif (response.status_code == 200):                
+            data_dict = response.json()
+            data = json.dumps(data_dict)
+            client_socket.send(data.encode())
+            return response.json()
+
         else:
-            response = requests.get(url)
-
-            if (response.status_code == 204):
-                mensagem = "204"
-                client_socket.send(mensagem.encode('utf-8'))
-
-            elif (response.status_code == 200):                
-                data_dict = response.json()
-                data = json.dumps(data_dict)
-                client_socket.send(data.encode())
-
-            else:
-                client_socket.send("Erro".encode('utf-8'))
+            client_socket.send("Erro".encode('utf-8'))
+            return False
     except Exception as e:
         print("Erro ao fazer a solicitação HTTP-GET:", e)
 
@@ -120,6 +130,13 @@ def solicitarCaixas(dataJson, client_socket):
                 client_socket.send("Erro".encode('utf-8'))
     except Exception as e:
         print("Erro ao fazer a solicitação HTTP-POST:", e)
+
+def alterarOcupacaoCaixa(url, operacao):
+    try:
+        response = requests.post(url, json=operacao)
+        print("alterarOcupacaoCaixa: ", response.status_code)
+    except Exception as e:
+        print("Erro ao alterar a ocupação do caixa:", e)
 
 def realizar_requisicao_POST(dataJson, client_socket):
     try:

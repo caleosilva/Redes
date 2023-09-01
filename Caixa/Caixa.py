@@ -170,6 +170,7 @@ def menu(client_server_socket):
                 continuar = False
         elif (escolha == '5'):
             continuar = False
+            return False
         else:
             print('\nOpção inválida!')
 
@@ -178,7 +179,7 @@ def acessarCaixa(client_server_socket):
     inputData = input("\nCódigo do caixa -> ")
 
     if (inputData != ''):
-        inputDataDict = {'header':'caixas', 'body': inputData}
+        inputDataDict = {'header':'caixas', 'body': inputData, 'operacao': 'ocuparCaixa'}
         dataRcv = send_receive_data(client_server_socket, inputDataDict)
         dataRcvJSON = json.loads(dataRcv)
         
@@ -206,7 +207,9 @@ def iniciarCaixa(client_server_socket):
         if (escolha == '1'):
             visualizarCaixas(client_server_socket)
         elif (escolha == '2'):
-            acessarCaixa(client_server_socket)
+            data = acessarCaixa(client_server_socket)
+            if (not data):
+                return
         elif (escolha == '3'):
             home = False
 
