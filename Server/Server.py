@@ -40,28 +40,54 @@ class MyHandler(BaseHTTPRequestHandler):
             self.wfile.write(b'URL invalida')
 
 
-    # Método para lidar com solicitações POST
     def do_POST(self):
         partes_url = self.path.split('/')
         content_length = int(self.headers['Content-Length'])
         dadosBody = self.rfile.read(content_length)
+        dadosBodyStr = dadosBody.decode()
+                    
+        try:
+            dadosJson = json.loads(dadosBodyStr)
+        except json.JSONDecodeError as e:
+            self.send_response(400)
+            self.send_header('Content-type', 'application/json')
+            self.end_headers()
+            self.wfile.write(json.dumps({"error": "Erro no formato JSON."}).encode())
+            return
         
-        print(dadosBody.decode())
-        print(type(dadosBody.decode()))
-        dadosJson = json.loads(dadosBody.decode())
-        print(dadosJson)
-        # dadosJson = json.dumps(dadosBody)
-        # print(dadosJson)
-
         if partes_url[1] == 'comprar':
+            dadosTirados = []
             with lock:
-                for chave, valor in dadosJson.items():
-                    if (dados[chave]['quantidade'] >= valor['quantidade']):
-                        dados[chave]['quantidade'] -= valor['quantidade']
+                for produto in dadosJson:
+                    chave = produto['chave']
+                    valor = produto['quantidade']
+                    if chave in dados and dados[chave]['quantidade'] >= valor:
+                        dados[chave]['quantidade'] -= valor
+                        dadosTirados.append({"chave": chave, "quantidade": valor})
+                    else:
+                        for prod in dadosTirados:
+                            chave = prod['chave']
+                            valor = prod['quantidade']
+                            dados[chave]['quantidade'] += valor
+                        
+                        self.send_response(400)
+                        self.send_header('Content-type', 'application/json')
+                        self.end_headers()
+                        self.wfile.write(json.dumps({"error": "Produto não disponível em quantidade suficiente."}).encode())
+                        return
+            
             self.send_response(201)
             self.send_header('Content-type', 'application/json')
             self.end_headers()
-            self.wfile.write(json.dumps({"statusCompra": "Compra finalizada com sucesso."}))
+            self.wfile.write(json.dumps({"statusCompra": "Compra finalizada com sucesso."}).encode())
+        else:
+            self.send_response(404)
+            self.send_header('Content-type', 'application/json')
+            self.end_headers()
+            self.wfile.write(json.dumps({"error": "Endpoint não encontrado."}).encode())
+
+
+
 
 
 def run(server_class=HTTPServer, handler_class=MyHandler, port=8000):

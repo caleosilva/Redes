@@ -80,10 +80,13 @@ def realizar_requisicao_POST(dataJson, client_socket):
 
             if (response.status_code == 400):
                 mensagem = "400"
-                client_socket.send(mensagem.encode('utf-8'))
+                client_socket.send("400".encode('utf-8'))
 
             elif (response.status_code == 201):
-                client_socket.send((response.status_code).encode())
+                client_socket.send("201".encode())
+
+            elif (response.status_code == 404):
+                client_socket.send(("404".status_code).encode())
 
             else:
                 print(response)

@@ -9,7 +9,7 @@ sys.path.append(parent_dir)
 
 from config import socket_host, socket_port, socket_rfid_client_host, socket_rfid_client_port
 
-carrinho = {}
+carrinho = []
 
 def enviar_ID_manualmente(client_server_socket):
     inputData = input('ID -> ')
@@ -32,32 +32,43 @@ def send_receive_data(socket, data):
         socket.sendall(serialized_data.encode())
         return socket.recv(1024).decode('utf-8')
 
-def mostrarCarrinho():
-    totalItens = len(carrinho)
-    valorTotal = 0
-    if(totalItens > 0):
+def mostrar_carrinho():
+    total_itens = len(carrinho)
+    valor_total = 0
+    if total_itens > 0:
         print('\n-=-=-= CARRINHO =-=-=-')
-        for chave, valor in carrinho.items():
-            print(f"[{chave}] {valor['nome']} (R$ {valor['preco']}): {valor['quantidade']} unidades")
-            # print(valor['preco'])
-            valorTotal += valor['preco'] * valor['quantidade']
-        print(f"\nPreço total: R$ {valorTotal:.2f}")
+        for item in carrinho:
+            print(f"[{item['chave']}] {item['nome']} (R$ {item['preco']}): {item['quantidade']} unidades")
+            valor_total += item['preco'] * item['quantidade']
+        print(f"\nPreço total: R$ {valor_total:.2f}")
     else:
         print("\nO carrinho está vazio.")
 
 def adicionar_produto_carrinho(produto):
-    if (produto == "204"):
+    if produto == "204":
         pass
     else:
         data_dict = json.loads(produto)
         for chave, valor in data_dict.items():
-            if (valor['quantidade'] > 0):
-                if (chave in carrinho and carrinho[chave]['quantidade'] < valor['quantidade']):
-                    carrinho[chave]['quantidade'] += 1
-                    print(f"\nO produto '{valor['nome']}' foi adicionado ao carrinho.")
-                elif (chave not in carrinho):
-                    carrinho[chave] = valor
-                    carrinho[chave]['quantidade'] = 1
+            if valor['quantidade'] > 0:
+                produto_encontrado = False
+                for item in carrinho:
+                    if item['chave'] == chave:
+                        if item['quantidade'] < valor['quantidade']:
+                            item['quantidade'] += 1
+                            print(f"\nO produto '{valor['nome']}' foi adicionado ao carrinho.")
+                        else:
+                            print(f"\nLimite de estoque atingido para o produto '{valor['nome']}' no carrinho.")
+                        produto_encontrado = True
+                        break
+
+                if not produto_encontrado:
+                    carrinho.append({
+                        'chave': chave,
+                        'nome': valor['nome'],
+                        'preco': valor['preco'],
+                        'quantidade': 1
+                    })
                     print(f"\nO produto '{valor['nome']}' foi adicionado ao carrinho.")
 
             else:
@@ -99,6 +110,11 @@ def solicitar_tags_RFID():
     except socket.error as e:
         print("\nNão foi possível se conectar com o RFID.")
 
+def realizar_compra(client_server_socket):
+    inputDataDict = {'header':'comprar', 'body': carrinho}
+    dataRcv = send_receive_data(client_server_socket, inputDataDict)
+    return dataRcv
+
 def menu(client_server_socket):
     continuar = True
 
@@ -108,6 +124,7 @@ def menu(client_server_socket):
         print('[2] -> Ler RFID')
         print('[3] -> Visualizar carrinho')
         print('[4] -> Finalizar compra')
+        print('[5] -> Sair')
 
         escolha = input('\nOpção -> ')
 
@@ -122,15 +139,20 @@ def menu(client_server_socket):
                     dataRcv = send_receive_data(client_server_socket, inputDataDict)
                     adicionar_produto_carrinho(dataRcv)
         elif (escolha == '3'):
-            mostrarCarrinho()
+            mostrar_carrinho()
+            print(carrinho)
         elif (escolha == '4'):
-            print('4')
+            resposta = realizar_compra(client_server_socket)
+            if (resposta == "201"):
+                print("\nCompra finalizada com sucesso!")
+                continuar = False
+        elif (escolha == '5'):
+            continuar = False
         else:
-            print('Opção inválida!')
+            print('\nOpção inválida!')
 
 def main():
     caixa_controller_socket = socket.socket()
-
     try:
         caixa_controller_socket.connect((socket_host, socket_port))
         print("Conectado ao caixa_controller_socket em", socket_host, "porta", socket_port)
