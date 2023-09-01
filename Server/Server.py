@@ -2,42 +2,59 @@ from http.server import BaseHTTPRequestHandler, HTTPServer
 import json
 import threading
 from dadosDict import dados
-from conexoes import conexoes
+from caixas import caixas
 
 
 lock = threading.Lock()
 # Define uma classe de manipulador personalizada que herda de BaseHTTPRequestHandler
 class MyHandler(BaseHTTPRequestHandler):
 
-    # Método para lidar com solicitações GET
     def do_GET(self):
         partes_url = self.path.split('/')
-
-        if partes_url[1] == '':
+        
+        # Busca por produto
+        if (partes_url[1] == 'id' and len(partes_url) == 2):
             self.send_response(200)
             self.send_header('Content-type', 'application/json')
             self.end_headers()
-            self.wfile.write (json.dumps(dados).encode('utf-8'))
-
-        elif partes_url[1] != '' and len(partes_url) == 2:
-
-            id_fruta = partes_url[1]
-
-            # Verifica se o ID da fruta existe no dicionário de dados
-            if id_fruta in dados:
+            self.wfile.write(json.dumps(dados).encode('utf-8'))
+        elif (partes_url[1] == 'id' and len(partes_url) == 3):
+            id_produto = partes_url[2]
+            
+            if id_produto in dados:
                 self.send_response(200)
                 self.send_header('Content-type', 'application/json')
                 self.end_headers()
-                self.wfile.write(json.dumps({id_fruta: dados[id_fruta]}).encode('utf-8'))
-
+                self.wfile.write(json.dumps({id_produto: dados[id_produto]}).encode('utf-8'))
             else:
                 self.send_response(204)
                 self.end_headers()
-                self.wfile.write(b'Fruta nao encontrada')
+                self.wfile.write(b'Produto nao encontrada')
+        
+        # Busca por caixas
+        elif (partes_url[1] == 'caixas' and len(partes_url) == 2):
+            self.send_response(200)
+            self.send_header('Content-type', 'application/json')
+            self.end_headers()
+            self.wfile.write(json.dumps(caixas).encode('utf-8'))
+        elif (partes_url[1] == 'caixas' and len(partes_url) == 3):
+            id_caixa = partes_url[2]
+
+            if id_caixa in caixas:
+                self.send_response(200)
+                self.send_header('Content-type', 'application/json')
+                self.end_headers()
+                self.wfile.write(json.dumps({id_caixa: caixas[id_caixa]}).encode('utf-8'))
+            else:
+                self.send_response(204)
+                self.end_headers()
+                self.wfile.write(b'Caixa nao encontrada')
+
         else:
             self.send_response(400)
             self.end_headers()
             self.wfile.write(b'URL invalida')
+
 
 
     def do_POST(self):
@@ -48,6 +65,7 @@ class MyHandler(BaseHTTPRequestHandler):
                     
         try:
             dadosJson = json.loads(dadosBodyStr)
+            print(dadosJson)
         except json.JSONDecodeError as e:
             self.send_response(400)
             self.send_header('Content-type', 'application/json')
@@ -55,7 +73,8 @@ class MyHandler(BaseHTTPRequestHandler):
             self.wfile.write(json.dumps({"error": "Erro no formato JSON."}).encode())
             return
         
-        if partes_url[1] == 'comprar':
+        # Realizar compra
+        if (partes_url[1] == 'comprar' and len(partes_url) == 2):
             dadosTirados = []
             with lock:
                 for produto in dadosJson:
@@ -80,6 +99,25 @@ class MyHandler(BaseHTTPRequestHandler):
             self.send_header('Content-type', 'application/json')
             self.end_headers()
             self.wfile.write(json.dumps({"statusCompra": "Compra finalizada com sucesso."}).encode())
+        
+        # Manipular caixa
+        elif (partes_url[1] == 'gerenciarCaixa' and len(partes_url) == 3):
+            id_caixa = partes_url[2]
+            print("Entrei aq")
+            with lock:
+                if id_caixa in caixas:
+                    caixas[id_caixa].update(dadosJson)
+                    self.send_response(201)
+                    self.send_header('Content-type', 'application/json')
+                    self.end_headers()
+                    self.wfile.write(json.dumps({"statusAtualizacao": "Atualizacao finalizada com sucesso."}).encode())
+                    return
+                else:
+                    self.send_response(204)
+                    self.send_header('Content-type', 'application/json')
+                    self.end_headers()
+                    self.wfile.write(json.dumps({"statusAtualizacao": "Caixa não encontrado"}).encode())
+                    return                
         else:
             self.send_response(404)
             self.send_header('Content-type', 'application/json')

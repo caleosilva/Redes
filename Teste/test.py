@@ -13,10 +13,20 @@ carrinho = {
     '5': {"nome": "Batata", "preco": 6.99, "quantidade": 2}
 }
 
+caixas = {'caixa1': {'socket': 'OBJSOCKET', 'ativo': True, 'bloqueado': False},
+    'caixa2': {'socket': 'OBJSOCKET', 'ativo': True, 'bloqueado': True},
+    'caixa3': {'socket': 'OBJSOCKET', 'ativo': False, 'bloqueado': False},
+    'caixa4': {'socket': 'OBJSOCKET', 'ativo': True, 'bloqueado': False}
+}
 
-for chave, valor in carrinho.items():
-    if (dados[chave]['quantidade'] >= valor['quantidade']):
-        dados[chave]['quantidade'] -= valor['quantidade']
+body = {
+    'caixa1': {'socket': '1', 'ativo': 2}
+}
 
-for chave, valor in dados.items():
-    print(valor)
+print(caixas['caixa1'])
+
+for caixa, info_atualizada in body.items():
+    if caixa in caixas:
+        caixas[caixa].update(info_atualizada)
+
+print(caixas['caixa1'])
