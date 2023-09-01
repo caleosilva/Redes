@@ -1,7 +1,8 @@
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import json
 import threading
-from dadosDict import dados;
+from dadosDict import dados
+from conexoes import conexoes
 
 
 lock = threading.Lock()
@@ -28,7 +29,6 @@ class MyHandler(BaseHTTPRequestHandler):
                 self.send_header('Content-type', 'application/json')
                 self.end_headers()
                 self.wfile.write(json.dumps({id_fruta: dados[id_fruta]}).encode('utf-8'))
-
 
             else:
                 self.send_response(204)
@@ -85,8 +85,6 @@ class MyHandler(BaseHTTPRequestHandler):
             self.send_header('Content-type', 'application/json')
             self.end_headers()
             self.wfile.write(json.dumps({"error": "Endpoint não encontrado."}).encode())
-
-
 
 
 
