@@ -10,6 +10,7 @@ sys.path.append(parent_dir)
 from config import socket_host, socket_port, socket_rfid_client_host, socket_rfid_client_port
 
 carrinho = []
+codigoDoCaixa = ''
 
 def enviar_ID_manualmente(client_server_socket):
     inputData = input('ID -> ')
@@ -17,7 +18,7 @@ def enviar_ID_manualmente(client_server_socket):
     if (inputData == ''):
         print("ID inválido!\n")
     else:
-        inputDataDict = {'header':'id', 'body': inputData}
+        inputDataDict = {'header':'id', 'body': inputData, 'codigoDoCaixa': codigoDoCaixa}
         dataRcv = send_receive_data(client_server_socket, inputDataDict)
         return dataRcv
 
@@ -91,7 +92,7 @@ def comunicacao_socket(rfid_socket, client_server_socket):
                     adicionar_produto_carrinho(produtoInfo)
                     rfid_socket.send(produtoInfo.encode('utf-8'))
 
-            mostrarCarrinho()
+            mostrar_carrinho()
     except socket.error as e:
         print("Erro de soquete:", e)
         rfid_socket.close()  # Fechar o socket em caso de erro
@@ -109,38 +110,59 @@ def solicitar_tags_RFID():
         return json.loads(dadosRcv)
     except socket.error as e:
         print("\nNão foi possível se conectar com o RFID.")
+        return []
 
 def realizar_compra(client_server_socket):
     inputDataDict = {'header':'comprar', 'body': carrinho}
     dataRcv = send_receive_data(client_server_socket, inputDataDict)
     return dataRcv
 
+def visualizarCaixas(client_server_socket):
+    inputDataDict = {'header':'caixas', 'body': ''}
+    dataRcv = send_receive_data(client_server_socket, inputDataDict)
+    dataRcvJSON = json.loads(dataRcv)
+
+    print("\n\n-=-=-= ESTADO DOS CAIXAS =-=-=-")
+    print("\n CÓDIGO     STATUS\n")
+    for chave, valor in dataRcvJSON.items():
+        ativo = valor['ativo']
+        if (ativo):
+            print(f"[{chave}] -> Ocupado")
+        else:
+            print(f"[{chave}] -> Livre")
+
 def menu(client_server_socket):
     continuar = True
 
     while continuar:
-        print('\n\n-=-=-=-= MENU =-=-=-=-')
+        print(f'\n\n-=-=-=-= MENU =-=-=-=-')
         print('[1] -> Inserir código manualmente')
         print('[2] -> Ler RFID')
         print('[3] -> Visualizar carrinho')
         print('[4] -> Finalizar compra')
-        print('[5] -> Sair')
+        print('[5] -> Encerrar caixa')
 
         escolha = input('\nOpção -> ')
 
         if (escolha == '1'):
             produtoID = enviar_ID_manualmente(client_server_socket)
-            adicionar_produto_carrinho(produtoID)
+            if(produtoID != 'False'):
+                adicionar_produto_carrinho(produtoID)
+            else:
+                print("O caixa está bloqueado!")
         elif (escolha == '2'):
             listaRFID = solicitar_tags_RFID()
             if(len(listaRFID) > 0):
                 for id in listaRFID:
-                    inputDataDict = {'header':'id', 'body': id}
+                    inputDataDict = {'header':'id', 'body': id, 'codigoDoCaixa': codigoDoCaixa}
                     dataRcv = send_receive_data(client_server_socket, inputDataDict)
-                    adicionar_produto_carrinho(dataRcv)
+                    if(dataRcv != 'False'):
+                        adicionar_produto_carrinho(dataRcv)
+                    else:
+                        print("O caixa está bloqueado!")
+                        break
         elif (escolha == '3'):
             mostrar_carrinho()
-            print(carrinho)
         elif (escolha == '4'):
             resposta = realizar_compra(client_server_socket)
             if (resposta == "201"):
@@ -151,14 +173,52 @@ def menu(client_server_socket):
         else:
             print('\nOpção inválida!')
 
+def acessarCaixa(client_server_socket):
+    global codigoDoCaixa
+    inputData = input("\nCódigo do caixa -> ")
+
+    if (inputData != ''):
+        inputDataDict = {'header':'caixas', 'body': inputData}
+        dataRcv = send_receive_data(client_server_socket, inputDataDict)
+        dataRcvJSON = json.loads(dataRcv)
+        
+        if (dataRcvJSON == 204):
+            print("\nCaixa não encontrado!")
+        else:
+            if(dataRcvJSON[inputData]['ativo']):
+                print("\nCaixa em questão está em uso.")
+            else:
+                codigoDoCaixa = inputData
+                menu(client_server_socket)
+    else:
+        print("\nCódigo inválido!")
+
+def iniciarCaixa(client_server_socket):
+    home = True
+    while home:
+        print(f'\n\n-=-=-=-= HOME =-=-=-=-')
+        print('[1] -> Visualizar caixas')
+        print('[2] -> Inserir o código do caixa')
+        print('[3] -> Sair')
+
+        escolha = input('\nOpção -> ')
+
+        if (escolha == '1'):
+            visualizarCaixas(client_server_socket)
+        elif (escolha == '2'):
+            acessarCaixa(client_server_socket)
+        elif (escolha == '3'):
+            home = False
+
+
+
 def main():
     caixa_controller_socket = socket.socket()
     try:
         caixa_controller_socket.connect((socket_host, socket_port))
         print("Conectado ao caixa_controller_socket em", socket_host, "porta", socket_port)
 
-        accept_thread = threading.Thread(target=menu, args=(caixa_controller_socket,))
-        accept_thread.start()
+        iniciarCaixa(caixa_controller_socket)
     except socket.error as e:
         print("Erro de conexão:", e)
     

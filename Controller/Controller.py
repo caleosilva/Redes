@@ -36,12 +36,24 @@ def receive_large_data(sock):
 
 def handle_client(client_socket):
     try:
-        while True: 
+        while True:
             dataJson = receive_large_data(client_socket)
+            print(dataJson)
             if (dataJson['header'] == 'id'):
-                realizar_requisicao_GET(dataJson, client_socket)
+                bloqueado = verificarBloqueioCaixa(dataJson)
+                if(bloqueado):
+                    client_socket.send('False'.encode())
+                else:
+                    url = server_host + dataJson['header'] + '/' + dataJson['body']
+                    realizar_requisicao_GET(url, client_socket)
             elif (dataJson['header'] == 'comprar'):
                 realizar_requisicao_POST(dataJson, client_socket)
+            elif (dataJson['header'] == 'caixas'):
+                if (dataJson['body'] == ''):
+                    url = server_host + dataJson['header']
+                else:
+                    url = server_host + dataJson['header'] + '/' + dataJson['body']
+                realizar_requisicao_GET(url, client_socket)
     except Exception as e:
         print("Erro ao lidar com o cliente:", e)
     finally:
@@ -49,13 +61,28 @@ def handle_client(client_socket):
             del conexoes[client_socket]  # Remover a conexão do dicionário
         client_socket.close()  # Fechar o socket
 
+def verificarBloqueioCaixa(dataJson):
+    codigoDoCaixa = dataJson['codigoDoCaixa']
+    urlCaixa = server_host + 'caixas/' + codigoDoCaixa
 
-def realizar_requisicao_GET(dataJson, client_socket):
+    try:
+        response = requests.get(urlCaixa)
+        dadosResponse = response.json()
+
+        if (dadosResponse[codigoDoCaixa]['bloqueado']):
+            return True
+        else:
+            return False
+    except Exception as e:
+        print("Erro ao fazer a solicitação HTTP-GET-CAIXA:", e)
+
+
+def realizar_requisicao_GET(url, client_socket):
     try:
         if not conexoes.get(client_socket):
             client_socket.send("Caixa bloqueado".encode('utf-8'))
         else:
-            response = requests.get(server_host + dataJson['body'])
+            response = requests.get(url)
 
             if (response.status_code == 204):
                 mensagem = "204"
@@ -70,6 +97,29 @@ def realizar_requisicao_GET(dataJson, client_socket):
                 client_socket.send("Erro".encode('utf-8'))
     except Exception as e:
         print("Erro ao fazer a solicitação HTTP-GET:", e)
+
+def solicitarCaixas(dataJson, client_socket):
+    try:
+        if not conexoes.get(client_socket):
+            client_socket.send("Caixa bloqueado".encode('utf-8'))
+        else:
+            response = requests.post(server_host + dataJson['header'], json=dataJson['body'])
+
+            if (response.status_code == 400):
+                mensagem = "400"
+                client_socket.send("400".encode('utf-8'))
+
+            elif (response.status_code == 201):
+                client_socket.send("201".encode())
+
+            elif (response.status_code == 404):
+                client_socket.send(("404".status_code).encode())
+
+            else:
+                print(response)
+                client_socket.send("Erro".encode('utf-8'))
+    except Exception as e:
+        print("Erro ao fazer a solicitação HTTP-POST:", e)
 
 def realizar_requisicao_POST(dataJson, client_socket):
     try:
