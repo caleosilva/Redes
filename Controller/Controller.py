@@ -36,9 +36,9 @@ def receive_large_data(sock):
 
 def handle_client(client_socket):
     try:
+        idCaixa = ''
         while True:
             dataJson = receive_large_data(client_socket)
-            print(dataJson)
             if (dataJson['header'] == 'id'):
                 bloqueado = verificarBloqueioCaixa(dataJson)
                 if(bloqueado):
@@ -53,6 +53,7 @@ def handle_client(client_socket):
                     url = server_host + dataJson['header']
                     realizar_requisicao_GET(url, client_socket)
                 else:
+                    idCaixa = dataJson['body']
                     url = server_host + dataJson['header'] + '/' + dataJson['body']
                     resultado = realizar_requisicao_GET(url, client_socket)
                     
@@ -63,12 +64,14 @@ def handle_client(client_socket):
     except Exception as e:
         print("Erro ao lidar com o cliente:", e)
 
-        urlManipulacao = server_host + "gerenciarCaixa" + '/' + dataJson['body']
-        alterarOcupacaoCaixa(urlManipulacao, body)
-        client_socket.close()
+        if (dataJson):
+            body = {'ativo': False}
+            urlManipulacao = server_host + "gerenciarCaixa" + '/' + idCaixa
+            alterarOcupacaoCaixa(urlManipulacao, body)
+            client_socket.close()
     finally:
         body = {'ativo': False}
-        urlManipulacao = server_host + "gerenciarCaixa" + '/' + dataJson['body']
+        urlManipulacao = server_host + "gerenciarCaixa" + '/' + idCaixa
         alterarOcupacaoCaixa(urlManipulacao, body)
         client_socket.close()
 
@@ -134,7 +137,6 @@ def solicitarCaixas(dataJson, client_socket):
 def alterarOcupacaoCaixa(url, operacao):
     try:
         response = requests.post(url, json=operacao)
-        print("alterarOcupacaoCaixa: ", response.status_code)
     except Exception as e:
         print("Erro ao alterar a ocupação do caixa:", e)
 

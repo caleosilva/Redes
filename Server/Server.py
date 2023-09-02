@@ -65,7 +65,6 @@ class MyHandler(BaseHTTPRequestHandler):
                     
         try:
             dadosJson = json.loads(dadosBodyStr)
-            print(dadosJson)
         except json.JSONDecodeError as e:
             self.send_response(400)
             self.send_header('Content-type', 'application/json')
@@ -103,7 +102,6 @@ class MyHandler(BaseHTTPRequestHandler):
         # Manipular caixa
         elif (partes_url[1] == 'gerenciarCaixa' and len(partes_url) == 3):
             id_caixa = partes_url[2]
-            print("Entrei aq")
             with lock:
                 if id_caixa in caixas:
                     caixas[id_caixa].update(dadosJson)
