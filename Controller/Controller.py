@@ -47,7 +47,9 @@ def handle_client(client_socket):
                     client_socket.send('False'.encode())
                 else:
                     url = server_host + dataJson['header'] + '/' + dataJson['body']
-                    realizar_requisicao_GET(url, client_socket)
+                    dataID = realizar_requisicao_GET(url, client_socket)
+                    adicionar_carrinho_POST(dataID, idCaixa)
+                    # print("Chama no chesck dele:", dataID)
             elif (dataJson['header'] == 'comprar'):
                 realizar_requisicao_POST(dataJson, client_socket, idCaixa)
             elif (dataJson['header'] == 'caixas'):
@@ -164,6 +166,25 @@ def realizar_requisicao_POST(dataJson, client_socket, idCaixa):
                 client_socket.send("Erro".encode('utf-8'))
     except Exception as e:
         print("Erro ao fazer a solicitação HTTP-POST:", e)
+
+def adicionar_carrinho_POST(dataJson, idCaixa):
+    try:
+        response = requests.post(server_host + 'adicionarProdutoCaixa/' + idCaixa, json=dataJson)
+        if (response.status_code == 400):
+            # client_socket.send("400".encode('utf-8'))
+            print("adicionar_carrinho_POST: 400")
+        elif (response.status_code == 201):
+            # client_socket.send("201".encode())
+            print("adicionar_carrinho_POST: 201")
+        elif (response.status_code == 404):
+            print("adicionar_carrinho_POST: 404")
+            # client_socket.send(("404".status_code).encode())
+        else:
+            print("Erro")
+            # client_socket.send("Erro".encode('utf-8'))
+    except Exception as e:
+        print("Erro ao adicionar item ao carrinho:", e)
+
 
 def main():
     host = socket_host

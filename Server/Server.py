@@ -3,6 +3,7 @@ import json
 import threading
 from dadosDict import dados
 from caixas import caixas
+from comprasEmAndamento import comprasEmAndamento
 
 
 lock = threading.Lock()
@@ -50,12 +51,31 @@ class MyHandler(BaseHTTPRequestHandler):
                 self.end_headers()
                 self.wfile.write(b'Caixa nao encontrada')
 
+        elif (partes_url[1] == 'produtosCaixa' and len(partes_url) == 2):
+            self.send_response(200)
+            self.send_header('Content-type', 'application/json')
+            self.end_headers()
+            self.wfile.write(json.dumps(comprasEmAndamento).encode('utf-8'))
+        
+        elif (partes_url[1] == 'produtosCaixa' and partes_url[2] != '' and len(partes_url) == 3):
+            idCaixa = partes_url[2]
+
+            if (idCaixa in comprasEmAndamento):
+                self.send_response(200)
+                self.send_header('Content-type', 'application/json')
+                self.end_headers()
+                self.wfile.write(json.dumps(comprasEmAndamento[idCaixa]).encode('utf-8'))
+            else:
+                self.send_response(204)
+                self.end_headers()
+                self.wfile.write(b'Caixa nao encontrado')
+        
+        
+        
         else:
             self.send_response(400)
             self.end_headers()
             self.wfile.write(b'URL invalida')
-
-
 
     def do_POST(self):
         partes_url = self.path.split('/')
@@ -75,6 +95,8 @@ class MyHandler(BaseHTTPRequestHandler):
         # Realizar compra
         if (partes_url[1] == 'comprar' and partes_url[2] != '' and len(partes_url) == 3):
             dadosTirados = []
+            idCaixa = partes_url[2]
+
             with lock:
                 for produto in dadosJson:
                     chave = produto['chave']
@@ -95,6 +117,8 @@ class MyHandler(BaseHTTPRequestHandler):
                         return
                 
                 caixas[partes_url[2]]['historicoCompras'].append(dadosJson)
+                comprasEmAndamento[partes_url[2]].clear()
+
             self.send_response(201)
             self.send_header('Content-type', 'application/json')
             self.end_headers()
@@ -117,6 +141,24 @@ class MyHandler(BaseHTTPRequestHandler):
                     self.end_headers()
                     self.wfile.write(json.dumps({"statusAtualizacao": "Caixa não encontrado"}).encode())
                     return                
+        
+        # Adicionar um produto no caixa
+        elif (partes_url[1] == 'adicionarProdutoCaixa' and partes_url[2] != '' and len(partes_url) == 3):
+            idCaixa = partes_url[2]
+            if (idCaixa in comprasEmAndamento):
+                comprasEmAndamento[idCaixa].append(dadosJson)
+
+                self.send_response(201)
+                self.send_header('Content-type', 'application/json')
+                self.end_headers()
+                self.wfile.write(json.dumps({"status": "Produto adicionado ao carrinho"}).encode())
+            else:
+                self.send_response(204)
+                self.send_header('Content-type', 'application/json')
+                self.end_headers()
+                self.wfile.write(json.dumps({"status": "Caixa não encontrado"}).encode())
+            
+        # URL incorreta
         else:
             self.send_response(404)
             self.send_header('Content-type', 'application/json')
@@ -129,7 +171,6 @@ def run(server_class=HTTPServer, handler_class=MyHandler, port=8000):
     server_address = ('', port)
     httpd = server_class(server_address, handler_class)
     print(f'Starting server on port {port}...')
-    # Inicia o servidor e o faz rodar indefinidamente
     httpd.serve_forever()
 
 
