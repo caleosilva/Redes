@@ -73,7 +73,7 @@ class MyHandler(BaseHTTPRequestHandler):
             return
         
         # Realizar compra
-        if (partes_url[1] == 'comprar' and len(partes_url) == 2):
+        if (partes_url[1] == 'comprar' and partes_url[2] != '' and len(partes_url) == 3):
             dadosTirados = []
             with lock:
                 for produto in dadosJson:
@@ -93,7 +93,8 @@ class MyHandler(BaseHTTPRequestHandler):
                         self.end_headers()
                         self.wfile.write(json.dumps({"error": "Produto não disponível em quantidade suficiente."}).encode())
                         return
-            
+                
+                caixas[partes_url[2]]['historicoCompras'].append(dadosJson)
             self.send_response(201)
             self.send_header('Content-type', 'application/json')
             self.end_headers()

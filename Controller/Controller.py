@@ -47,7 +47,7 @@ def handle_client(client_socket):
                     url = server_host + dataJson['header'] + '/' + dataJson['body']
                     realizar_requisicao_GET(url, client_socket)
             elif (dataJson['header'] == 'comprar'):
-                realizar_requisicao_POST(dataJson, client_socket)
+                realizar_requisicao_POST(dataJson, client_socket, idCaixa)
             elif (dataJson['header'] == 'caixas'):
                 if (dataJson['body'] == ''):
                     url = server_host + dataJson['header']
@@ -140,12 +140,12 @@ def alterarOcupacaoCaixa(url, operacao):
     except Exception as e:
         print("Erro ao alterar a ocupação do caixa:", e)
 
-def realizar_requisicao_POST(dataJson, client_socket):
+def realizar_requisicao_POST(dataJson, client_socket, idCaixa):
     try:
         if not conexoes.get(client_socket):
             client_socket.send("Caixa bloqueado".encode('utf-8'))
         else:
-            response = requests.post(server_host + dataJson['header'], json=dataJson['body'])
+            response = requests.post(server_host + dataJson['header'] + '/' + idCaixa, json=dataJson['body'])
 
             if (response.status_code == 400):
                 mensagem = "400"
