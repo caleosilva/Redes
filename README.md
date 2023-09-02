@@ -10,7 +10,7 @@ Para viabilizar essa solução, cada produto disponível na loja foi associado a
 
 bla bla bla
 
-![Logo do Projeto](https://github.com/caleosilva/Redes/raw/main/ArquiteturaRedes.png)
+![Logo do Projeto](https://github.com/caleosilva/Redes/raw/main/ArquiteturaProjeto.png)
 
 
 continua bla bla bla
