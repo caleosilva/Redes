@@ -6,3 +6,8 @@ Nesse contexto, um supermercado localizado em Feira de Santana decidiu investir 
 
 Para viabilizar essa solução, cada produto disponível na loja foi associado a uma TAG exclusiva que armazena informações detalhadas sobre o item. O desenvolvimento desse sistema foi realizado utilizando a linguagem de programação Python, na versão 3.11, e suas bibliotecas internas, incluindo threading, socket e http.server, para garantir uma implementação eficiente e confiável.
 
+# 2. Metodologia
+
+bla bla bla
+
+![Logo do Projeto](https://github.com/seu-usuario/seu-repositorio/raw/main/ArquiteturaRedes.png)
