@@ -39,6 +39,8 @@ def handle_client(client_socket):
         idCaixa = ''
         while True:
             dataJson = receive_large_data(client_socket)
+            print("DataJSon:", dataJson)
+
             if (dataJson['header'] == 'id'):
                 bloqueado = verificarBloqueioCaixa(dataJson)
                 if(bloqueado):
@@ -56,8 +58,7 @@ def handle_client(client_socket):
                     idCaixa = dataJson['body']
                     url = server_host + dataJson['header'] + '/' + dataJson['body']
                     resultado = realizar_requisicao_GET(url, client_socket)
-                    
-                    if (resultado[dataJson['body']]['ativo'] == False):
+                    if (resultado and resultado[dataJson['body']]['ativo'] == False):
                         body = {'ativo': True}
                         urlManipulacao = server_host + "gerenciarCaixa" + '/' + dataJson['body']
                         alterarOcupacaoCaixa(urlManipulacao, body)
@@ -98,6 +99,7 @@ def realizar_requisicao_GET(url, client_socket):
         if (response.status_code == 204):
             mensagem = "204"
             client_socket.send(mensagem.encode('utf-8'))
+            return False
 
         elif (response.status_code == 200):                
             data_dict = response.json()

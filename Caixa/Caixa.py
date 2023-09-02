@@ -132,47 +132,62 @@ def visualizarCaixas(client_server_socket):
             print(f"[{chave}] -> Livre")
 
 def menu(client_server_socket):
-    continuar = True
 
-    while continuar:
+    menuInicial = True
+    while menuInicial:
         print(f'\n\n-=-=-=-= MENU =-=-=-=-')
-        print('[1] -> Inserir código manualmente')
-        print('[2] -> Ler RFID')
-        print('[3] -> Visualizar carrinho')
-        print('[4] -> Finalizar compra')
-        print('[5] -> Encerrar caixa')
+        print('[1] -> Iniciar nova compra')
+        print('[2] -> Encerrar caixa')
 
-        escolha = input('\nOpção -> ')
+        escolhaMenuInicial = input('\nOpção -> ')
 
-        if (escolha == '1'):
-            produtoID = enviar_ID_manualmente(client_server_socket)
-            if(produtoID != 'False'):
-                adicionar_produto_carrinho(produtoID)
-            else:
-                print("O caixa está bloqueado!")
-        elif (escolha == '2'):
-            listaRFID = solicitar_tags_RFID()
-            if(len(listaRFID) > 0):
-                for id in listaRFID:
-                    inputDataDict = {'header':'id', 'body': id, 'codigoDoCaixa': codigoDoCaixa}
-                    dataRcv = send_receive_data(client_server_socket, inputDataDict)
-                    if(dataRcv != 'False'):
-                        adicionar_produto_carrinho(dataRcv)
+        if (escolhaMenuInicial == '1'):
+            continuar = True
+            while continuar:
+                print(f'\n\n-=-=-=-= MENU COMPRAS =-=-=-=-')
+                print('[1] -> Inserir código manualmente')
+                print('[2] -> Ler RFID')
+                print('[3] -> Visualizar carrinho')
+                print('[4] -> Finalizar compra')
+                print('[5] -> Cancelar')
+
+                escolha = input('\nOpção -> ')
+
+                if (escolha == '1'):
+                    produtoID = enviar_ID_manualmente(client_server_socket)
+                    if(produtoID != 'False'):
+                        adicionar_produto_carrinho(produtoID)
                     else:
                         print("O caixa está bloqueado!")
-                        break
-        elif (escolha == '3'):
-            mostrar_carrinho()
-        elif (escolha == '4'):
-            resposta = realizar_compra(client_server_socket)
-            if (resposta == "201"):
-                print("\nCompra finalizada com sucesso!")
-                continuar = False
-        elif (escolha == '5'):
-            continuar = False
-            return False
-        else:
-            print('\nOpção inválida!')
+                elif (escolha == '2'):
+                    listaRFID = solicitar_tags_RFID()
+                    if(len(listaRFID) > 0):
+                        for id in listaRFID:
+                            inputDataDict = {'header':'id', 'body': id, 'codigoDoCaixa': codigoDoCaixa}
+                            dataRcv = send_receive_data(client_server_socket, inputDataDict)
+                            if(dataRcv != 'False'):
+                                adicionar_produto_carrinho(dataRcv)
+                            else:
+                                print("O caixa está bloqueado!")
+                                break
+                elif (escolha == '3'):
+                    mostrar_carrinho()
+                elif (escolha == '4'):
+                    if (len(carrinho) > 0):
+                        resposta = realizar_compra(client_server_socket)
+                        if (resposta == "201"):
+                            print("\nCompra finalizada com sucesso!")
+                            continuar = False
+                    else:
+                        print("Carrinho vazio")
+                elif (escolha == '5'):
+                    continuar = False
+                else:
+                    print('\nOpção inválida!')
+        elif (escolhaMenuInicial == '2'):
+            return 'Encerrar'
+
+    
 
 def acessarCaixa(client_server_socket):
     global codigoDoCaixa
@@ -190,7 +205,8 @@ def acessarCaixa(client_server_socket):
                 print("\nCaixa em questão está em uso.")
             else:
                 codigoDoCaixa = inputData
-                menu(client_server_socket)
+                result = menu(client_server_socket)
+                return result
     else:
         print("\nCódigo inválido!")
 
@@ -208,7 +224,7 @@ def iniciarCaixa(client_server_socket):
             visualizarCaixas(client_server_socket)
         elif (escolha == '2'):
             data = acessarCaixa(client_server_socket)
-            if (not data):
+            if (data == 'Encerrar'):
                 return
         elif (escolha == '3'):
             home = False
