@@ -157,7 +157,23 @@ class MyHandler(BaseHTTPRequestHandler):
                 self.send_header('Content-type', 'application/json')
                 self.end_headers()
                 self.wfile.write(json.dumps({"status": "Caixa não encontrado"}).encode())
+        
+        elif (partes_url[1] == 'limparCarrinho' and partes_url[2] != '' and len(partes_url) == 3):
+            idCaixa = partes_url[2]
             
+            if (idCaixa in comprasEmAndamento):
+                comprasEmAndamento[idCaixa].clear()
+
+                self.send_response(201)
+                self.send_header('Content-type', 'application/json')
+                self.end_headers()
+                self.wfile.write(json.dumps({"status": "Carrinho limpado"}).encode())
+            else:
+                self.send_response(204)
+                self.send_header('Content-type', 'application/json')
+                self.end_headers()
+                self.wfile.write(json.dumps({"status": "Caixa não encontrado"}).encode())
+
         # URL incorreta
         else:
             self.send_response(404)

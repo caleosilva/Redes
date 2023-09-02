@@ -181,6 +181,8 @@ def menu(client_server_socket):
                     else:
                         print("Carrinho vazio")
                 elif (escolha == '5'):
+                    inputDataDict = {'header':'limparCaixa', 'body': ''}
+                    dataRcv = send_receive_data(client_server_socket, inputDataDict)
                     continuar = False
                 else:
                     print('\nOpção inválida!')
