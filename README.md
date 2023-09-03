@@ -11,9 +11,10 @@
     Engenharia de Computação – Universidade Estadual de Feira de Santana (UEFS)
     Av. Transnordestina, s/n, Novo Horizonte
     Feira de Santana – BA, Brasil – 44036-900
-    
-    caleosilva75@gmail.com
   </p>
+
+  <center>caleosilva75@gmail.com</center>
+
 </div>
 
 
