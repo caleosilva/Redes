@@ -1,5 +1,24 @@
-### Relatório 1 do MI de Concorrência e Conectividade
-### Aluno: Georgenes Caleo Silva Pinheiro, 20111202
+<div align="center">
+  <h1>
+      Relatório do problema 1: Supermercado inteligente
+  </h1>
+
+  <h3>
+    Georgenes Caleo Silva Pinheiro
+  </h3>
+
+  <p>
+    Engenharia de Computação – Universidade Estadual de Feira de Santana (UEFS)
+    Av. Transnordestina, s/n, Novo Horizonte
+    Feira de Santana – BA, Brasil – 44036-900
+    
+    caleosilva75@gmail.com
+  </p>
+</div>
+
+
+
+
 
 # 1. Introdução
 
