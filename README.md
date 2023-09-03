@@ -37,3 +37,13 @@ No caso das rotas GET, existem seis possibilidades válidas, cada uma com seu pr
 5. http://localhost:8000/produtosCaixa: Mostra os produtos atualmente em processamento em todos os caixas em tempo real.
 6. http://localhost:8000/produtosCaixa/codigoCaixa: Exibe os produtos que estão sendo processados em um caixa individual em tempo real.
 
+No que diz respeito às rotas POST, existem quatro possibilidades, sendo elas:
+
+1. http://localhost:8000/comprar/codigoCaixa: Finaliza a compra de um caixa em específico
+2. http://localhost:8000/gerenciarCaixa/codigoCaixa: Altera as informações referente ao Caixa.
+3. http://localhost:8000/adicionarProdutoCaixa/codigoCaixa: Adiciona um produto ao carrinho para ser comprado
+4. http://localhost:8000/limparCarrinho/codigoCaixa: Limpa o carrinho de um Caixa específico
+
+As requisições HTTP desempenham um papel fundamental no funcionamento deste sistema. As requisições GET permitem a recuperação de informações específicas, enquanto as requisições POST possibilitam a atualização ou adição de novos dados. Isso cria uma interface flexível que permite aos clientes (como caixas e o controller) interagir com o servidor de forma eficaz, executando ações como consulta de produtos, compra, gerenciamento de caixas, adição de produtos a carrinhos e limpeza de carrinhos.
+
+
