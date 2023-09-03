@@ -30,20 +30,22 @@ Para acessar, atualizar ou adicionar informações a esses dicionários, impleme
 
 No caso das rotas GET, existem seis possibilidades válidas, cada uma com seu propósito específico:
 
-1. http://localhost:8000/id: Retorna todos os produtos disponíveis em estoque.
-2. http://localhost:8000/id/codigoProduto: Retorna os dados de um produto específico com base em seu código.
-3. http://localhost:8000/caixas: Fornece informações sobre todos os caixas registrados no sistema.
-4. http://localhost:8000/caixas/codigoCaixa: Retorna os detalhes de um caixa específico com base em seu código.
-5. http://localhost:8000/produtosCaixa: Mostra os produtos atualmente em processamento em todos os caixas em tempo real.
-6. http://localhost:8000/produtosCaixa/codigoCaixa: Exibe os produtos que estão sendo processados em um caixa individual em tempo real.
+1. GET http://localhost:8000/id: Retorna todos os produtos disponíveis em estoque.
+2. GET http://localhost:8000/id/codigoProduto: Retorna os dados de um produto específico com base em seu código.
+3. GET http://localhost:8000/caixas: Fornece informações sobre todos os caixas registrados no sistema.
+4. GET http://localhost:8000/caixas/codigoCaixa: Retorna os detalhes de um caixa específico com base em seu código.
+5. GET http://localhost:8000/produtosCaixa: Mostra os produtos atualmente em processamento em todos os caixas em tempo real.
+6. GET http://localhost:8000/produtosCaixa/codigoCaixa: Exibe os produtos que estão sendo processados em um caixa individual em tempo real.
 
 No que diz respeito às rotas POST, existem quatro possibilidades, sendo elas:
 
-1. http://localhost:8000/comprar/codigoCaixa: Finaliza a compra de um caixa em específico
-2. http://localhost:8000/gerenciarCaixa/codigoCaixa: Altera as informações referente ao Caixa.
-3. http://localhost:8000/adicionarProdutoCaixa/codigoCaixa: Adiciona um produto ao carrinho para ser comprado
-4. http://localhost:8000/limparCarrinho/codigoCaixa: Limpa o carrinho de um Caixa específico
+1. POST http://localhost:8000/comprar/codigoCaixa: Finaliza a compra de um caixa em específico
+2. POST http://localhost:8000/gerenciarCaixa/codigoCaixa: Altera as informações referente ao Caixa.
+3. POST http://localhost:8000/adicionarProdutoCaixa/codigoCaixa: Adiciona um produto ao carrinho para ser comprado
+4. POST http://localhost:8000/limparCarrinho/codigoCaixa: Limpa o carrinho de um Caixa específico
 
 As requisições HTTP desempenham um papel fundamental no funcionamento deste sistema. As requisições GET permitem a recuperação de informações específicas, enquanto as requisições POST possibilitam a atualização ou adição de novos dados. Isso cria uma interface flexível que permite aos clientes (como caixas e o controller) interagir com o servidor de forma eficaz, executando ações como consulta de produtos, compra, gerenciamento de caixas, adição de produtos a carrinhos e limpeza de carrinhos.
+
+Além disso, para assegurar um funcionamento estável e um controle eficaz das informações, recorreu-se aos princípios da "Zona Crítica", proporcionados pela biblioteca "threading". Por meio dessa abordagem, é possível garantir que apenas um processo tenha acesso a uma área específica em um determinado momento, o que, por sua vez, assegura que o controle de estoque e as atualizações de informações transcorram de maneira eficiente e ordenada.
 
 
