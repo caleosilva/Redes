@@ -58,4 +58,11 @@ Quanto ao fluxo de operação destinado ao cliente, ele se depara com um menu in
 
 Para o administrador, as funcionalidades estão disponíveis através do software Postman, eliminando a necessidade de uma interface exclusiva. Usando o Postman, o administrador pode acessar informações detalhadas sobre cada caixa, incluindo o status (ativo, bloqueado) e o histórico de compras. Além disso, é possível monitorar as compras em tempo real realizadas em cada caixa e tomar ações como bloquear, desbloquear, ativar ou desativar um terminal, dependendo das necessidades operacionais.
 
+Além disso, é importante mencionar que o sistema foi desenvolvido com grande atenção à robustez e segurança. Todos os possíveis erros e exceções são tratados de maneira adequada, garantindo a estabilidade das operações tanto para os clientes quanto para os funcionários que o utilizam. Qualquer intercorrência, como produtos sem estoque, códigos inválidos ou falhas na comunicação, é detectada e tratada de maneira apropriada, fornecendo ao usuário feedback claro e útil.
+
+No que diz respeito ao controle de estoque, uma funcionalidade crucial do sistema, todas as compras finalizadas resultam na diminuição automática da quantidade de produtos disponíveis. Isso assegura que o estoque da loja seja atualizado em tempo real, evitando situações em que produtos fora de estoque sejam vendidos por engano. A integração perfeita entre o caixa e o controle de estoque é uma das principais vantagens deste sistema, tornando-o uma ferramenta valiosa para gerenciamento eficaz de recursos e para aprimorar a experiência do cliente.
+
+Em resumo, o sistema não apenas oferece uma interface amigável para os clientes efetuarem compras com facilidade, mas também fornece ferramentas poderosas para os administradores monitorarem e gerenciarem eficientemente as operações em vários caixas. Com um foco especial na robustez e na segurança, o sistema se destaca pela capacidade de tratamento de erros e pela atualização automática do estoque, contribuindo para um ambiente de compras eficiente e confiável.
+
+
 
