@@ -50,4 +50,12 @@ As requisições HTTP desempenham um papel fundamental no funcionamento deste si
 
 Além disso, para assegurar um funcionamento estável e um controle eficaz das informações, recorreu-se aos princípios da "Zona Crítica", proporcionados pela biblioteca "threading". Por meio dessa abordagem, é possível garantir que apenas um processo tenha acesso a uma área específica em um determinado momento, o que, por sua vez, assegura que o controle de estoque e as atualizações de informações transcorram de maneira eficiente e ordenada.
 
+# 3. Resultados
+
+Para iniciar o sistema e prepará-lo para o uso pelo usuário final, é necessário executar sequencialmente os componentes principais: Server, Controller, leitor RFID e Caixa. No ambiente do caixa, o funcionário deve identificar qual dos quatro terminais disponíveis será utilizado pelo sensor RFID. Uma vez feita a seleção, o sistema está pronto para uso.
+
+Quanto ao fluxo de operação destinado ao cliente, ele se depara com um menu intuitivo que oferece diversas opções. Isso inclui o início de uma nova compra, onde o cliente pode escolher inserir manualmente o código do produto ou permitir que o leitor RFID faça a identificação automática. Além disso, o cliente pode visualizar os produtos já registrados junto com o valor total, finalizar a compra efetuando o pagamento ou cancelar a operação.
+
+Para o administrador, as funcionalidades estão disponíveis através do software Postman, eliminando a necessidade de uma interface exclusiva. Usando o Postman, o administrador pode acessar informações detalhadas sobre cada caixa, incluindo o status (ativo, bloqueado) e o histórico de compras. Além disso, é possível monitorar as compras em tempo real realizadas em cada caixa e tomar ações como bloquear, desbloquear, ativar ou desativar um terminal, dependendo das necessidades operacionais.
+
 
