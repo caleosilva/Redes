@@ -1,3 +1,6 @@
+### Relatório 1 do MI de Concorrência e Conectividade
+### Aluno: Georgenes Caleo Silva Pinheiro, 20111202
+
 # 1. Introdução
 
 Considerando o crescente interesse na automação de supermercados, impulsionado pelo avanço da tecnologia e o desenvolvimento de conceitos como IoT (Internet of Things), muitas empresas buscam implementar soluções tecnológicas para aprimorar sua eficiência operacional, reduzir custos e oferecer uma experiência de compra melhorada aos clientes.
