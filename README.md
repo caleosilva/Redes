@@ -21,3 +21,19 @@ O sistema inicia com a comunicação entre o leitor RFID e o Caixa, e posteriorm
 Para lidar eficientemente com múltiplas requisições simultâneas ao Server, adotamos o conceito de Threads, que está intimamente ligado à programação concorrente. As Threads permitem a execução paralela de diferentes partes de um programa.
 
 No contexto do nosso sistema, uma Thread fixa (representada em amarelo) fica encarregada de ouvir as solicitações de conexão do Caixa. Após aceitar uma solicitação, ela cria uma nova Thread dedicada (em verde) para lidar com a comunicação específica desse Caixa. Essa nova Thread é responsável por receber as solicitações, encaminhá-las ao Server e retornar as respostas ao Caixa. Esse mecanismo de Threads otimiza a capacidade de resposta do sistema e o torna eficaz em ambientes com múltiplos pontos de venda.
+
+Em relação ao servidor (Server), adotamos a estratégia de utilizar três dicionários distintos para armazenar os dados necessários de forma organizada e eficiente.
+
+No primeiro dicionário, mantemos informações detalhadas sobre os produtos, incluindo seus nomes, quantidades em estoque e valores. O segundo dicionário é responsável por armazenar informações relacionadas a cada caixa, como seu status de ativação, estado de bloqueio e histórico de compras. Por fim, a terceira estrutura é utilizada para rastrear os produtos que estão atualmente sendo processados em tempo real em um caixa.
+
+Para acessar, atualizar ou adicionar informações a esses dicionários, implementamos rotas GET e POST personalizadas que oferecem várias funcionalidades.
+
+No caso das rotas GET, existem seis possibilidades válidas, cada uma com seu propósito específico:
+
+1. http://localhost:8000/id: Retorna todos os produtos disponíveis em estoque.
+2. http://localhost:8000/id/codigoProduto: Retorna os dados de um produto específico com base em seu código.
+3. http://localhost:8000/caixas: Fornece informações sobre todos os caixas registrados no sistema.
+4. http://localhost:8000/caixas/codigoCaixa: Retorna os detalhes de um caixa específico com base em seu código.
+5. http://localhost:8000/produtosCaixa: Mostra os produtos atualmente em processamento em todos os caixas em tempo real.
+6. http://localhost:8000/produtosCaixa/codigoCaixa: Exibe os produtos que estão sendo processados em um caixa individual em tempo real.
+
