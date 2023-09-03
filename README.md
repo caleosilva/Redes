@@ -64,5 +64,14 @@ No que diz respeito ao controle de estoque, uma funcionalidade crucial do sistem
 
 Em resumo, o sistema não apenas oferece uma interface amigável para os clientes efetuarem compras com facilidade, mas também fornece ferramentas poderosas para os administradores monitorarem e gerenciarem eficientemente as operações em vários caixas. Com um foco especial na robustez e na segurança, o sistema se destaca pela capacidade de tratamento de erros e pela atualização automática do estoque, contribuindo para um ambiente de compras eficiente e confiável.
 
+# Conclusão
+
+Ao concluir este projeto, obtivemos valiosas lições sobre a complexa interconexão de sistemas, explorando o funcionamento e a comunicação entre computadores distintos por meio da tecnologia de socket. A integração bem-sucedida do módulo de leitura RFID, em conjunto com as tags RFID UHF, aprimorou nossa compreensão sobre a aplicação prática dessas tecnologias emergentes.
+
+Além disso, ampliamos nossos conhecimentos em diversas áreas de arquitetura de sistemas. Exploramos a arquitetura de Nuvem IoT centralizada, o funcionamento da rede TCP/IP e a administração de contêineres com Docker. Ao desenvolver interfaces de usuário, ganhamos experiência com a implementação de um protocolo baseado em API REST.
+
+Destacamos que todos os requisitos propostos foram atendidos com sucesso. Na interface do caixa, os clientes podem iniciar uma compra, verificar os itens selecionados e concluir a compra efetuando o pagamento. Por sua vez, na interface de administração do supermercado, os gestores podem acessar informações detalhadas sobre os caixas, bloqueá-los ou liberá-los, consultar o histórico de compras e monitorar as transações em tempo real.
+
+Para futuras melhorias no projeto, identificamos duas áreas principais de foco. Primeiramente, há a necessidade de implementar leitores RFID individuais para cada caixa, permitindo a leitura contínua e automática dos produtos em tempo real, sem a necessidade de solicitar a leitura a cada item. Além disso, no lado do servidor, visando escalar o sistema para atender demandas ainda maiores, consideramos a implementação de um buffer de requisições e a adoção de multi-threading para transformar o servidor em uma plataforma de alto desempenho. Essas melhorias proporcionariam uma experiência ainda mais eficaz e escalável aos usuários do sistema.
 
 
