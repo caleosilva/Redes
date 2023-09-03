@@ -97,7 +97,7 @@ Destacamos que todos os requisitos propostos foram atendidos com sucesso. Na int
 
 Para futuras melhorias no projeto, identificamos duas áreas principais de foco. Primeiramente, há a necessidade de implementar leitores RFID individuais para cada caixa, permitindo a leitura contínua e automática dos produtos em tempo real, sem a necessidade de solicitar a leitura a cada item. Além disso, no lado do servidor, visando escalar o sistema para atender demandas ainda maiores, consideramos a implementação de um buffer de requisições e a adoção de multi-threading para transformar o servidor em uma plataforma de alto desempenho. Essas melhorias proporcionariam uma experiência ainda mais eficaz e escalável aos usuários do sistema.
 
-# 5. Referências
+# Referências
 
 Python threading module: Disponível em: https://docs.python.org/3/library/threading.html. Acesso em: 23 de ago. de 2023
 
