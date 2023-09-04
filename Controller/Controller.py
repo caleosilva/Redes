@@ -45,11 +45,9 @@ def handle_client(client_socket):
                     dataID = realizar_requisicao_GET(url, client_socket)
                     if (dataID):
                         for chave, valor in dataID.items():
-                            print(chave)
                             novoValor = valor.copy()
                             novoValor['quantidade'] = 1
-                            print(novoValor)
-
+                            
                             adicionar_carrinho_POST({chave: novoValor}, idCaixa)
 
                     # print("Chama no chesck dele:", dataID)

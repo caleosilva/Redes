@@ -32,7 +32,7 @@ def comunicacao_socket(rfid_client_socket):
         rfid_client_socket.send(serialized_data.encode())
 
         rfid_client_socket.close()
-        print("Conexão finalizada com:", rfid_address)
+        print("Conexão finalizada com:", rfid_client_socket)
 
     except socket.error as e:
         print("Erro de soquete:", e)

@@ -188,9 +188,7 @@ def menu(client_server_socket):
                     print('\nOpção inválida!')
         elif (escolhaMenuInicial == '2'):
             return 'Encerrar'
-
     
-
 def acessarCaixa(client_server_socket):
     global codigoDoCaixa
     inputData = input("\nCódigo do caixa -> ")
@@ -230,8 +228,6 @@ def iniciarCaixa(client_server_socket):
                 return
         elif (escolha == '3'):
             home = False
-
-
 
 def main():
     caixa_controller_socket = socket.socket()
