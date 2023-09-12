@@ -177,6 +177,7 @@ def menu(client_server_socket):
                         resposta = realizar_compra(client_server_socket)
                         if (resposta == "201"):
                             print("\nCompra finalizada com sucesso!")
+                            carrinho.clear()
                             continuar = False
                     else:
                         print("Carrinho vazio")

@@ -40,7 +40,7 @@ def comunicacao_socket(rfid_client_socket):
 
 def main():
     socket_rfid_client_host = '172.16.103.0'
-    socket_rfid_client_port = 3983
+    socket_rfid_client_port = 1111
 
     try:
         rfid_client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
