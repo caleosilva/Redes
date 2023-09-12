@@ -36,7 +36,7 @@ Além disso, optamos por desenvolver e testar o produto por meio de containers D
 
 Inicialmente, exploramos diversas arquiteturas de sistema antes de selecionar o modelo que melhor se adequava às nossas necessidades. O design escolhido, representado abaixo, foi o que seguimos para a implementação:
 
-![Logo do Projeto](https://github.com/caleosilva/Redes/raw/main/ArquiteturaProjeto.png)
+![Logo do Projeto](https://github.com/caleosilva/Redes/raw/main/ArquiteturaRedes.png)
 
 
 O sistema inicia com a comunicação entre o leitor RFID e o Caixa, e posteriormente entre o Caixa e o Controller, utilizando o mecanismo de comunicação por Sockets. Essa tecnologia possibilita a troca de dados entre processos em computadores distintos ou no mesmo computador. Através dela, as TAGs RFID lidas pelo Caixa são transmitidas para o Controller, que por sua vez realiza requisições ao Server.
